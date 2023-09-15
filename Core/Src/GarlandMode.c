@@ -4,17 +4,17 @@
 #include "gpio.h"
 #include "utils.h"
 
-int GarlandMode_run(struct GarlandMode* mode, uint32_t* last_pressed_time) {
+bool GarlandMode_run(struct GarlandMode* mode, uint32_t* last_pressed_time) {
 	// Get current code, such as GREEN or WAIT
-	uint32_t led = mode->code[mode->current_code_index];
+	uint32_t led = mode->codes[mode->current_code_index];
 
 	if (led == WAIT) {
-		int start_time = HAL_GetTick();
+		uint32_t start_time = HAL_GetTick();
 
 		// Wait for delay_time, while checking if button is pressed
 		while (HAL_GetTick() < start_time + mode->delay_time) {
 			if (is_btn_pressed(last_pressed_time)) {
-				return 1;
+				return true;
 			}
 		}
 	} else {
@@ -39,5 +39,5 @@ int GarlandMode_run(struct GarlandMode* mode, uint32_t* last_pressed_time) {
 	    mode->current_code_index = 0;
 	}
 
-	return 0;
+	return false;
 };

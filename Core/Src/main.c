@@ -96,7 +96,7 @@ int main(void)
 		  // Green and yellow, simultaneously
   		  {
 		    .len = 6,
-			.code = { WAIT, GREEN, YELLOW, WAIT, GREEN, YELLOW },
+			.codes = { WAIT, GREEN, YELLOW, WAIT, GREEN, YELLOW },
 			.delay_time = 1000,
 			.current_code_index = 0,
 			.ledState = DEFAULT_STATE
@@ -125,7 +125,7 @@ int main(void)
 
   while (1) {
     /* USER CODE END WHILE */
-	  int button_pressed = GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
+	  bool button_pressed = GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
 
 	  if (button_pressed) {
 		  reset_LEDs();

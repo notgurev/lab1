@@ -1,10 +1,10 @@
 void toggleLED(int code);
 
-void setLED(int code, int state);
+void setLED(int code, bool state);
 
 void reset_LEDs();
 
-int is_btn_pressed(uint32_t* last_pressed_time);
+bool is_btn_pressed(uint32_t* last_pressed_time);
 
 void sleep(int ms);
 

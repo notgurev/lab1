@@ -1,5 +1,5 @@
 ../Core/Src/utils.c:4:6:toggleLED	16	static
 ../Core/Src/utils.c:9:6:setLED	16	static
 ../Core/Src/utils.c:14:6:sleep	16	static
-../Core/Src/utils.c:21:5:is_btn_pressed	32	static
+../Core/Src/utils.c:21:6:is_btn_pressed	32	static
 ../Core/Src/utils.c:47:6:reset_LEDs	8	static
