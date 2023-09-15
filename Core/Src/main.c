@@ -94,7 +94,7 @@ int main(void)
   // Length, codes array, delay, current code index, default state
   struct LEDMode modes[] = {
 		  // Green and yellow, simultaneously
-  		  { 6, { WAIT, GREEN, YELLOW, WAIT, GREEN, YELLOW }, 1000, 0, DEFAULT_STATE },
+  		  { 6, { GREEN, YELLOW, WAIT, GREEN, YELLOW, WAIT }, 1000, 0, {true, false, false} },
 
 		  // Green, then yellow
   		  { 6, { GREEN, WAIT, GREEN, YELLOW, WAIT, YELLOW }, 500, 0, DEFAULT_STATE },
@@ -120,10 +120,6 @@ int main(void)
   while (1) {
     /* USER CODE END WHILE */
 	  int button_pressed = LEDMode_activate(&modes[cur_mode_index], &last_pressed_time);
-
-	  if (modes[cur_mode_index].current_code_index > modes[cur_mode_index].len) {
-		  modes[cur_mode_index].current_code_index = 0;
-	  }
 
 	  if (button_pressed) {
 		  reset_LEDs();

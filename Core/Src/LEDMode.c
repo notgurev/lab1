@@ -10,6 +10,10 @@ int LEDMode_activate(struct LEDMode* mode, uint32_t* last_pressed_time) {
 	// Set to next mode
 	mode->current_code_index++;
 
+    if (mode->current_code_index > mode->len) {
+	    mode->current_code_index = 0;
+	}
+
 	if (led == WAIT) {
 		int start_time = HAL_GetTick();
 
