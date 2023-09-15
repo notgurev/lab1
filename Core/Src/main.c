@@ -91,6 +91,7 @@ int main(void)
 
   const int MODES_LEN = 4;
 
+  // Length, codes array, delay, current code index, default state
   struct LEDMode modes[] = {
 		  // Green and yellow, simultaneously
   		  { 6, { WAIT, GREEN, YELLOW, WAIT, GREEN, YELLOW }, 1000, 0, DEFAULT_STATE },
