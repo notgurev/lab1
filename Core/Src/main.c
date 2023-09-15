@@ -23,8 +23,9 @@
 /* USER CODE BEGIN Includes */
 
 #include <stdbool.h>
+
+#include "GarlandMode.h"
 #include "utils.h"
-#include "LEDMode.h"
 
 /* USER CODE END Includes */
 
@@ -92,7 +93,7 @@ int main(void)
   const int MODES_LEN = 4;
 
   // Length, codes array, delay, current code index, default state
-  struct LEDMode modes[] = {
+  struct GarlandMode modes[] = {
 		  // Green and yellow, simultaneously
   		  { 6, { WAIT, GREEN, YELLOW, WAIT, GREEN, YELLOW }, 1000, 0, DEFAULT_STATE },
 
@@ -119,7 +120,7 @@ int main(void)
 
   while (1) {
     /* USER CODE END WHILE */
-	  int button_pressed = LEDMode_activate(&modes[cur_mode_index], &last_pressed_time);
+	  int button_pressed = GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
 
 	  if (button_pressed) {
 		  reset_LEDs();

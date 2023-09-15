@@ -1,9 +1,10 @@
+#include "GarlandMode.h"
+
 #include "main.h"
 #include "gpio.h"
-#include "LEDMode.h"
 #include "utils.h"
 
-int LEDMode_activate(struct LEDMode* mode, uint32_t* last_pressed_time) {
+int GarlandMode_run(struct GarlandMode* mode, uint32_t* last_pressed_time) {
 	// Get current code, such as GREEN or WAIT
 	uint32_t led = mode->code[mode->current_code_index];
 
