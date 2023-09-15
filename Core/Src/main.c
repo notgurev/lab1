@@ -20,9 +20,10 @@
 #include "main.h"
 #include "gpio.h"
 
+#include "LEDMode.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "utils.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,6 +34,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 /* USER CODE END PD */
+
+#define DEFAULT_STATE { 0, 0, 0 }
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
@@ -53,6 +56,41 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+int LEDMode_activate(struct LEDMode* mode, uint32_t* last_pressed_time) {
+	// Get current code, such as GREEN or WAIT
+	uint32_t led = mode->code[mode->current_code_index];
+
+	// Set to next mode
+	mode->current_code_index++;
+
+	if (led == WAIT) {
+		int start_time = HAL_GetTick();
+
+		// Wait for delay_time, while checking if button is pressed
+		while (HAL_GetTick() < start_time + mode->delay_time) {
+			if (is_btn_pressed(last_pressed_time)) {
+				return 1;
+			}
+		}
+	} else {
+		switch (led) {
+		case GREEN:
+			mode->ledState[0] = !mode->ledState[0];
+			break;
+		case YELLOW:
+			mode->ledState[1] = !mode->ledState[1];
+			break;
+		case RED:
+			mode->ledState[2] = !mode->ledState[2];
+			break;
+		}
+
+		toggleLED(led);
+	}
+
+	return 0;
+};
 
 /* USER CODE END 0 */
 
@@ -86,13 +124,58 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
+  const int MODES_AMOUNT = 4;
+
+  struct LEDMode modes[] = {
+		  // Green and yellow, simultaneously
+  		  { 6, { WAIT, GREEN, YELLOW, WAIT, GREEN, YELLOW }, 1000, 0, DEFAULT_STATE },
+
+		  // Green, then yellow
+  		  { 6, { GREEN, WAIT, GREEN, YELLOW, WAIT, YELLOW }, 500, 0, DEFAULT_STATE },
+
+		  // Green on: red, then yellow
+		  // Green off: red, then yellow
+  		  { 10, { WAIT, GREEN, WAIT, RED, WAIT, RED, WAIT, YELLOW, WAIT, YELLOW }, 200, 0, DEFAULT_STATE },
+
+		  // Red, then yellow, then green
+  		  { 9, { GREEN, WAIT, GREEN, YELLOW, WAIT, YELLOW, RED, WAIT, RED }, 500, 0, DEFAULT_STATE }
+  };
+
+  int cur_mode_index = 0;
+
+  uint32_t last_pressed_time = 0;
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+
+  while (1) {
     /* USER CODE END WHILE */
+	  int button_pressed = LEDMode_activate(&modes[cur_mode_index], &last_pressed_time);
+
+	  struct LEDMode cur_mode = modes[cur_mode_index];
+
+	  // Reset to zero if max code index is reached
+	  if (cur_mode.current_code_index > cur_mode.len) {
+		  cur_mode.current_code_index = 0;
+	  }
+
+	  if (button_pressed) {
+		  reset_LEDs();
+
+		  cur_mode_index++;
+		  if (cur_mode_index >= MODES_AMOUNT) {
+			  cur_mode_index = 0;
+		  }
+
+		  struct LEDMode new_mode = modes[cur_mode_index];
+
+		  setLED(GREEN, new_mode.ledState[0]);
+		  setLED(YELLOW, new_mode.ledState[1]);
+		  setLED(RED, new_mode.ledState[2]);
+	  }
 
     /* USER CODE BEGIN 3 */
   }

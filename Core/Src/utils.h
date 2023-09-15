@@ -4,4 +4,11 @@ void setLED(int code, int state);
 
 void reset_LEDs();
 
+int is_btn_pressed(uint32_t* last_pressed_time);
+
 void sleep(int ms);
+
+#define WAIT -1
+#define GREEN GPIO_PIN_13
+#define YELLOW GPIO_PIN_14
+#define RED GPIO_PIN_15

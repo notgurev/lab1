@@ -12,7 +12,33 @@ void setLED(int code, bool state) {
 
 // Sleeps for ms milliseconds
 void sleep(int ms) {
-	HAL_Delay(milliseconds);
+	HAL_Delay(ms);
+}
+
+// Checks if button is pressed.
+// Also checks value of HAL_GetTick to avoid rattle.
+// Sets last_pressed_time if button is considered pressed.
+int is_btn_pressed(uint32_t* last_pressed_time) {
+	// GPIO_PIN_RESET means pressed
+	int pressed = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15) == GPIO_PIN_RESET;
+
+	if (!pressed) {
+		return 0;
+	}
+
+	// If set too low, might trigger twice per click
+	// If too high, might not register the second click
+	const int RATTLE_TIME_MS = 500;
+
+	int time_passed = HAL_GetTick() - *last_pressed_time;
+	int rattle = time_passed < RATTLE_TIME_MS;
+
+	if (rattle) {
+		return 0;
+	}
+
+	*last_pressed_time = HAL_GetTick();
+	return 1;
 }
 
 // Resets all three LEDs
