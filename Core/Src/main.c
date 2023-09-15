@@ -89,7 +89,7 @@ int main(void)
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
 
-  const int MODES_AMOUNT = 4;
+  const int MODES_LEN = 4;
 
   struct LEDMode modes[] = {
 		  // Green and yellow, simultaneously
@@ -128,7 +128,7 @@ int main(void)
 		  reset_LEDs();
 
 		  cur_mode_index++;
-		  if (cur_mode_index >= MODES_AMOUNT) {
+		  if (cur_mode_index >= MODES_LEN) {
 			  cur_mode_index = 0;
 		  }
 
