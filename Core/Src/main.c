@@ -121,10 +121,6 @@ int main(void)
     /* USER CODE END WHILE */
 	  int button_pressed = LEDMode_activate(&modes[cur_mode_index], &last_pressed_time);
 
-	  if (modes[cur_mode_index].current_code_index > modes[cur_mode_index].len) {
-		  modes[cur_mode_index].current_code_index = 0;
-	  }
-
 	  if (button_pressed) {
 		  reset_LEDs();
 
