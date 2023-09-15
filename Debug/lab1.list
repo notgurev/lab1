@@ -663,7 +663,6 @@ int main(void)
  80006dc:	2304      	movs	r3, #4
  80006de:	f8c7 36a8 	str.w	r3, [r7, #1704]	; 0x6a8
 
-  // Length, codes array, delay, current code index, default state
   struct GarlandMode modes[] = {
  80006e2:	f507 63d6 	add.w	r3, r7, #1712	; 0x6b0
  80006e6:	f2a3 63ac 	subw	r3, r3, #1708	; 0x6ac

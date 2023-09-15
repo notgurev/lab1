@@ -92,10 +92,15 @@ int main(void)
 
   const int MODES_LEN = 4;
 
-  // Length, codes array, delay, current code index, default state
   struct GarlandMode modes[] = {
 		  // Green and yellow, simultaneously
-  		  { 6, { WAIT, GREEN, YELLOW, WAIT, GREEN, YELLOW }, 1000, 0, DEFAULT_STATE },
+  		  {
+		    .len = 6,
+			.code = { WAIT, GREEN, YELLOW, WAIT, GREEN, YELLOW },
+			.delay_time = 1000,
+			.current_code_index = 0,
+			.ledState = DEFAULT_STATE
+  		  },
 
 		  // Green, then yellow
   		  { 6, { GREEN, WAIT, GREEN, YELLOW, WAIT, YELLOW }, 500, 0, DEFAULT_STATE },
