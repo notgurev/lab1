@@ -10,6 +10,11 @@ void setLED(int code, bool state) {
 	HAL_GPIO_WritePin(GPIOD, code, state);
 }
 
+// Sleeps for ms milliseconds
+void sleep(int ms) {
+	HAL_Delay(milliseconds);
+}
+
 // Resets all three LEDs
 void reset_LEDs() {
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
