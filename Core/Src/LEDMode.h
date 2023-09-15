@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 struct LEDMode {
 	int len; // length of codes array
 	int code[100]; // codes array, max 100 elements

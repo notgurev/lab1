@@ -19,11 +19,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "gpio.h"
-
-#include "LEDMode.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
+#include <stdbool.h>
 #include "utils.h"
+#include "LEDMode.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -124,8 +126,11 @@ int main(void)
 
 	  if (button_pressed) {
 		  reset_LEDs();
+
 		  cur_mode_index++;
-		  if (cur_mode_index >= MODES_AMOUNT) cur_mode_index = 0;
+		  if (cur_mode_index >= MODES_AMOUNT) {
+			  cur_mode_index = 0;
+		  }
 
 		  setLED(GREEN, modes[cur_mode_index].ledState[0]);
 		  setLED(YELLOW, modes[cur_mode_index].ledState[1]);
