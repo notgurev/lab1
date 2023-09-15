@@ -5,3 +5,5 @@ struct LEDMode {
 	int current_code_index; // index of current code
 	int ledState[3]; // green, yellow, red
 };
+
+int LEDMode_activate(struct LEDMode* mode, uint32_t* last_pressed_time);

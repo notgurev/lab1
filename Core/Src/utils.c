@@ -37,7 +37,9 @@ int is_btn_pressed(uint32_t* last_pressed_time) {
 		return 0;
 	}
 
+	// Register press
 	*last_pressed_time = HAL_GetTick();
+
 	return 1;
 }
 
