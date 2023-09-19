@@ -1,6 +1,6 @@
-void toggleLED(int code);
+void toggle_LED(int code);
 
-void setLED(int code, bool state);
+void set_LED(int code, GPIO_PinState state);
 
 void reset_LEDs();
 

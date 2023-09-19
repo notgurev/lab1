@@ -99,7 +99,7 @@ int main(void)
 			.codes = { WAIT, GREEN, YELLOW, WAIT, GREEN, YELLOW },
 			.delay_time = 1000,
 			.current_code_index = 0,
-			.ledState = DEFAULT_STATE
+			.led_state = DEFAULT_STATE
   		  },
 
 		  // Green, then yellow
@@ -125,20 +125,19 @@ int main(void)
 
   while (1) {
     /* USER CODE END WHILE */
-	  bool button_pressed = GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
+	  GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
 
-	  if (button_pressed) {
-		  reset_LEDs();
+	  reset_LEDs();
 
-		  cur_mode_index++;
-		  if (cur_mode_index >= MODES_LEN) {
-			  cur_mode_index = 0;
-		  }
-
-		  setLED(GREEN, modes[cur_mode_index].ledState[0]);
-		  setLED(YELLOW, modes[cur_mode_index].ledState[1]);
-		  setLED(RED, modes[cur_mode_index].ledState[2]);
+	  cur_mode_index++;
+	  if (cur_mode_index >= MODES_LEN) {
+		  cur_mode_index = 0;
 	  }
+
+	  set_LED(GREEN, modes[cur_mode_index].led_state[0]);
+	  set_LED(YELLOW, modes[cur_mode_index].led_state[1]);
+	  set_LED(RED, modes[cur_mode_index].led_state[2]);
+
 
     /* USER CODE BEGIN 3 */
   }

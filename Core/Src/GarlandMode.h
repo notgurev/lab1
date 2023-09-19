@@ -8,7 +8,7 @@ struct GarlandMode {
 	int codes[100]; // codes array, max 100 elements
 	uint32_t delay_time; // delay time when code == WAIT
 	int current_code_index; // index of current code
-	bool ledState[3]; // green, yellow, red
+	GPIO_PinState led_state[3]; // green, yellow, red
 };
 
-bool GarlandMode_run(struct GarlandMode* mode, uint32_t* last_pressed_time);
+void GarlandMode_run(struct GarlandMode* mode, uint32_t* last_pressed_time);
