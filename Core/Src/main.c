@@ -305,26 +305,35 @@ bool handle_new_command() {
 				return false;
 		}
 	remaining_timeouts_input = pattern_length;
-	print_format("Creating new mode with length of %d. Please specify timeout (slow, medium, fast):\r\n", pattern_length);
+	print_format("Creating new mode with length of %d. Please specify timeouts for each state (slow, medium, fast):\r\n", pattern_length);
 	return true;
 }
 
 bool handle_new_command_timeout() {
 	const uint8_t state_idx = new_mode.len - remaining_timeouts_input;
-	if (strlen(cmd) != 0) {
-		if (string_equals("slow", cmd)) {
-			new_mode.states[state_idx].timeout = SLOW;
-		} else if (string_equals("medium", cmd)) {
-			new_mode.states[state_idx].timeout = MEDIUM;
-		} else if (string_equals("fast", cmd)) {
-			new_mode.states[state_idx].timeout = FAST;
-		} else {
-			return false;
-		}
-	} else {
+
+	if (strlen(cmd) == 0) { // no code after "new"
 		return false;
 	}
+
+	if (string_equals("slow", cmd)) {
+		new_mode.states[state_idx].timeout = SLOW;
+	}
+
+	else if (string_equals("medium", cmd)) {
+		new_mode.states[state_idx].timeout = MEDIUM;
+	}
+
+	else if (string_equals("fast", cmd)) {
+		new_mode.states[state_idx].timeout = FAST;
+	}
+
+	else {
+		return false;
+	}
+
 	--remaining_timeouts_input;
+
 	if (remaining_timeouts_input == 0) {
 		adding_mode = CONST_MODES_COUNT + (adding_mode + 1 - CONST_MODES_COUNT) % (MAX_MODES_COUNT - CONST_MODES_COUNT + 1);
 		const uint8_t mode_idx = adding_mode;
@@ -333,8 +342,11 @@ bool handle_new_command_timeout() {
 		current_max_mode = (current_max_mode < MAX_MODES_COUNT - 1) ? adding_mode : current_max_mode;
 		return true;
 	}
+
 	print_format("Added mode: %d \r\n", adding_mode);
+
 	print_format("%d timeouts are remaining:\r\n", remaining_timeouts_input);
+
 	return true;
 }
 
