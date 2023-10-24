@@ -1204,6 +1204,7 @@ void handle_command_line() {
  8000af8:	4b36      	ldr	r3, [pc, #216]	; (8000bd4 <handle_command_line+0xfc>)
  8000afa:	2201      	movs	r2, #1
  8000afc:	701a      	strb	r2, [r3, #0]
+
 		__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
  8000afe:	4b36      	ldr	r3, [pc, #216]	; (8000bd8 <handle_command_line+0x100>)
  8000b00:	681b      	ldr	r3, [r3, #0]
@@ -1220,6 +1221,7 @@ void handle_command_line() {
  8000b16:	681b      	ldr	r3, [r3, #0]
  8000b18:	f042 0220 	orr.w	r2, r2, #32
  8000b1c:	60da      	str	r2, [r3, #12]
+
 		success = true;
  8000b1e:	2301      	movs	r3, #1
  8000b20:	71fb      	strb	r3, [r7, #7]
@@ -1237,12 +1239,14 @@ void handle_command_line() {
  8000b32:	4b28      	ldr	r3, [pc, #160]	; (8000bd4 <handle_command_line+0xfc>)
  8000b34:	2200      	movs	r2, #0
  8000b36:	701a      	strb	r2, [r3, #0]
+
 		HAL_UART_AbortReceive(&huart6);
  8000b38:	4827      	ldr	r0, [pc, #156]	; (8000bd8 <handle_command_line+0x100>)
  8000b3a:	f001 ff09 	bl	8002950 <HAL_UART_AbortReceive>
 		HAL_UART_Abort_IT(&huart6);
  8000b3e:	4826      	ldr	r0, [pc, #152]	; (8000bd8 <handle_command_line+0x100>)
  8000b40:	f001 ffaa 	bl	8002a98 <HAL_UART_Abort_IT>
+
 		__HAL_UART_DISABLE_IT(&huart6, UART_IT_TXE);
  8000b44:	4b24      	ldr	r3, [pc, #144]	; (8000bd8 <handle_command_line+0x100>)
  8000b46:	681b      	ldr	r3, [r3, #0]
@@ -1259,6 +1263,7 @@ void handle_command_line() {
  8000b5c:	681b      	ldr	r3, [r3, #0]
  8000b5e:	f022 0220 	bic.w	r2, r2, #32
  8000b62:	60da      	str	r2, [r3, #12]
+
 		success = true;
  8000b64:	2301      	movs	r3, #1
  8000b66:	71fb      	strb	r3, [r7, #7]
