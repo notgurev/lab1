@@ -3,8 +3,6 @@
 #include <usart.h>
 
 #define TIMEOUT_DEF 500
-//UART_HandleTypeDef huart6;
-uint16_t timeout;
 
 ring_buffer rx_buffer = { { 0 }, 0, 0};
 ring_buffer tx_buffer = { { 0 }, 0, 0};

@@ -428,9 +428,13 @@ void clear_buffer() {
 
 void readln() {
     if (is_interrupt_mode) {
+    	if (!data_available()) {
+    		transmit(".");
+    		return;
+    	}
+    	transmit("YES");
         while(data_available()) {
             receive_char_async();
-            return;
         }
     } else {
     	if (!receive_char()) { // try to receive synchronously
