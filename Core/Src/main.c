@@ -40,6 +40,8 @@
 /* USER CODE BEGIN PD */
 
 #define DEFAULT_STATE { 0, 0, 0 }
+const char OK_MESSAGE[]= "OK";
+const char WRONG_COMMAND[] = "Wrong command";
 
 /* USER CODE END PD */
 
