@@ -18,7 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "gpio.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -32,12 +34,17 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+typedef char* string;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-/* USER CODE END PD */
+
 #define DEFAULT_STATE { 0, 0, 0 }
+
+/* USER CODE END PD */
+
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
@@ -57,7 +64,6 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /**
@@ -88,9 +94,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 
   const int MODES_LEN = 4;
+
+  string s = "hello\n";
 
   struct GarlandMode modes[] = {
 		  // Green and yellow, simultaneously
@@ -124,7 +133,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   while (1) {
-    /* USER CODE END WHILE */
 	  GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
 
 	  reset_LEDs();
@@ -137,7 +145,7 @@ int main(void)
 	  set_LED(GREEN, modes[cur_mode_index].led_state[0]);
 	  set_LED(YELLOW, modes[cur_mode_index].led_state[1]);
 	  set_LED(RED, modes[cur_mode_index].led_state[2]);
-
+    /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
