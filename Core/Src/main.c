@@ -367,22 +367,13 @@ void handle_command_line() {
 
 	if (string_equals("set interrupts on", cmd)) {
 		is_interrupt_mode = true;
-
-		__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
-		__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
-
 		success = true;
 	}
 
 	else if (string_equals("set interrupts off", cmd)) {
 		is_interrupt_mode = false;
-
 		HAL_UART_AbortReceive(&huart6);
 		HAL_UART_Abort_IT(&huart6);
-
-		__HAL_UART_DISABLE_IT(&huart6, UART_IT_TXE);
-		__HAL_UART_DISABLE_IT(&huart6, UART_IT_RXNE);
-
 		success = true;
 	}
 
