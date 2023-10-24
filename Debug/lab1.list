@@ -7,19 +7,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         000043fc  080001b0  080001b0  000101b0  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000300  080045ac  080045ac  000145ac  2**2
+  2 .rodata       00000310  080045ac  080045ac  000145ac  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  080048ac  080048ac  00020184  2**0
+  3 .ARM.extab    00000000  080048bc  080048bc  00020184  2**0
                   CONTENTS
-  4 .ARM          00000008  080048ac  080048ac  000148ac  2**2
+  4 .ARM          00000008  080048bc  080048bc  000148bc  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  080048b4  080048b4  00020184  2**0
+  5 .preinit_array 00000000  080048c4  080048c4  00020184  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  080048b4  080048b4  000148b4  2**2
+  6 .init_array   00000004  080048c4  080048c4  000148c4  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .fini_array   00000004  080048b8  080048b8  000148b8  2**2
+  7 .fini_array   00000004  080048c8  080048c8  000148c8  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .data         00000184  20000000  080048bc  00020000  2**2
+  8 .data         00000184  20000000  080048cc  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
   9 .ccmram       00000000  10000000  10000000  00020184  2**0
                   CONTENTS
@@ -29,23 +29,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  12 .ARM.attributes 00000030  00000000  00000000  00020184  2**0
                   CONTENTS, READONLY
- 13 .debug_info   00009680  00000000  00000000  000201b4  2**0
+ 13 .debug_info   0000966e  00000000  00000000  000201b4  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_abbrev 00001bee  00000000  00000000  00029834  2**0
+ 14 .debug_abbrev 00001bee  00000000  00000000  00029822  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_aranges 00000838  00000000  00000000  0002b428  2**3
+ 15 .debug_aranges 00000838  00000000  00000000  0002b410  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_ranges 00000770  00000000  00000000  0002bc60  2**3
+ 16 .debug_ranges 00000770  00000000  00000000  0002bc48  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  00022dc0  00000000  00000000  0002c3d0  2**0
+ 17 .debug_macro  00022dc0  00000000  00000000  0002c3b8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0000ac95  00000000  00000000  0004f190  2**0
+ 18 .debug_line   0000ac95  00000000  00000000  0004f178  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000d03fe  00000000  00000000  00059e25  2**0
+ 19 .debug_str    000d03f2  00000000  00000000  00059e0d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000050  00000000  00000000  0012a223  2**0
+ 20 .comment      00000050  00000000  00000000  0012a1ff  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  00002844  00000000  00000000  0012a274  2**2
+ 21 .debug_frame  00002844  00000000  00000000  0012a250  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -780,7 +780,7 @@ void set_active_mode(uint8_t mode_number) {
  8000810:	200001e4 	.word	0x200001e4
  8000814:	20000214 	.word	0x20000214
  8000818:	20000004 	.word	0x20000004
- 800081c:	080046d4 	.word	0x080046d4
+ 800081c:	080046e4 	.word	0x080046e4
 
 08000820 <handle_set_command>:
 
@@ -962,7 +962,7 @@ bool handle_new_command() {
  800095c:	b2da      	uxtb	r2, r3
  800095e:	4b07      	ldr	r3, [pc, #28]	; (800097c <handle_new_command+0xfc>)
  8000960:	701a      	strb	r2, [r3, #0]
-	print_format("Creating new mode with length of %d. Please specify timeout (slow, medium, fast):\r\n", pattern_length);
+	print_format("Creating new mode with length of %d. Please specify timeouts for each state (slow, medium, fast):\r\n", pattern_length);
  8000962:	6879      	ldr	r1, [r7, #4]
  8000964:	4806      	ldr	r0, [pc, #24]	; (8000980 <handle_new_command+0x100>)
  8000966:	f7ff fef1 	bl	800074c <print_format>
@@ -991,66 +991,74 @@ bool handle_new_command_timeout() {
  8000990:	781b      	ldrb	r3, [r3, #0]
  8000992:	1ad3      	subs	r3, r2, r3
  8000994:	71fb      	strb	r3, [r7, #7]
-	if (strlen(cmd) != 0) {
+
+	if (strlen(cmd) == 0) { // no code after "new"
  8000996:	4b45      	ldr	r3, [pc, #276]	; (8000aac <handle_new_command_timeout+0x128>)
  8000998:	781b      	ldrb	r3, [r3, #0]
  800099a:	2b00      	cmp	r3, #0
- 800099c:	d02c      	beq.n	80009f8 <handle_new_command_timeout+0x74>
-		if (string_equals("slow", cmd)) {
- 800099e:	4943      	ldr	r1, [pc, #268]	; (8000aac <handle_new_command_timeout+0x128>)
- 80009a0:	4843      	ldr	r0, [pc, #268]	; (8000ab0 <handle_new_command_timeout+0x12c>)
- 80009a2:	f000 fc7b 	bl	800129c <string_equals>
- 80009a6:	4603      	mov	r3, r0
- 80009a8:	2b00      	cmp	r3, #0
- 80009aa:	d007      	beq.n	80009bc <handle_new_command_timeout+0x38>
-			new_mode.states[state_idx].timeout = SLOW;
- 80009ac:	79fb      	ldrb	r3, [r7, #7]
- 80009ae:	4a3d      	ldr	r2, [pc, #244]	; (8000aa4 <handle_new_command_timeout+0x120>)
- 80009b0:	009b      	lsls	r3, r3, #2
- 80009b2:	4413      	add	r3, r2
- 80009b4:	f44f 72fa 	mov.w	r2, #500	; 0x1f4
- 80009b8:	809a      	strh	r2, [r3, #4]
- 80009ba:	e01f      	b.n	80009fc <handle_new_command_timeout+0x78>
-		} else if (string_equals("medium", cmd)) {
- 80009bc:	493b      	ldr	r1, [pc, #236]	; (8000aac <handle_new_command_timeout+0x128>)
- 80009be:	483d      	ldr	r0, [pc, #244]	; (8000ab4 <handle_new_command_timeout+0x130>)
- 80009c0:	f000 fc6c 	bl	800129c <string_equals>
- 80009c4:	4603      	mov	r3, r0
- 80009c6:	2b00      	cmp	r3, #0
- 80009c8:	d006      	beq.n	80009d8 <handle_new_command_timeout+0x54>
-			new_mode.states[state_idx].timeout = MEDIUM;
- 80009ca:	79fb      	ldrb	r3, [r7, #7]
- 80009cc:	4a35      	ldr	r2, [pc, #212]	; (8000aa4 <handle_new_command_timeout+0x120>)
- 80009ce:	009b      	lsls	r3, r3, #2
- 80009d0:	4413      	add	r3, r2
- 80009d2:	22fa      	movs	r2, #250	; 0xfa
- 80009d4:	809a      	strh	r2, [r3, #4]
- 80009d6:	e011      	b.n	80009fc <handle_new_command_timeout+0x78>
-		} else if (string_equals("fast", cmd)) {
- 80009d8:	4934      	ldr	r1, [pc, #208]	; (8000aac <handle_new_command_timeout+0x128>)
- 80009da:	4837      	ldr	r0, [pc, #220]	; (8000ab8 <handle_new_command_timeout+0x134>)
- 80009dc:	f000 fc5e 	bl	800129c <string_equals>
- 80009e0:	4603      	mov	r3, r0
- 80009e2:	2b00      	cmp	r3, #0
- 80009e4:	d006      	beq.n	80009f4 <handle_new_command_timeout+0x70>
-			new_mode.states[state_idx].timeout = FAST;
- 80009e6:	79fb      	ldrb	r3, [r7, #7]
- 80009e8:	4a2e      	ldr	r2, [pc, #184]	; (8000aa4 <handle_new_command_timeout+0x120>)
- 80009ea:	009b      	lsls	r3, r3, #2
- 80009ec:	4413      	add	r3, r2
- 80009ee:	2264      	movs	r2, #100	; 0x64
- 80009f0:	809a      	strh	r2, [r3, #4]
- 80009f2:	e003      	b.n	80009fc <handle_new_command_timeout+0x78>
-		} else {
-			return false;
- 80009f4:	2300      	movs	r3, #0
- 80009f6:	e051      	b.n	8000a9c <handle_new_command_timeout+0x118>
-		}
-	} else {
+ 800099c:	d101      	bne.n	80009a2 <handle_new_command_timeout+0x1e>
+		return false;
+ 800099e:	2300      	movs	r3, #0
+ 80009a0:	e07c      	b.n	8000a9c <handle_new_command_timeout+0x118>
+	}
+
+	if (string_equals("slow", cmd)) {
+ 80009a2:	4942      	ldr	r1, [pc, #264]	; (8000aac <handle_new_command_timeout+0x128>)
+ 80009a4:	4842      	ldr	r0, [pc, #264]	; (8000ab0 <handle_new_command_timeout+0x12c>)
+ 80009a6:	f000 fc79 	bl	800129c <string_equals>
+ 80009aa:	4603      	mov	r3, r0
+ 80009ac:	2b00      	cmp	r3, #0
+ 80009ae:	d007      	beq.n	80009c0 <handle_new_command_timeout+0x3c>
+		new_mode.states[state_idx].timeout = SLOW;
+ 80009b0:	79fb      	ldrb	r3, [r7, #7]
+ 80009b2:	4a3c      	ldr	r2, [pc, #240]	; (8000aa4 <handle_new_command_timeout+0x120>)
+ 80009b4:	009b      	lsls	r3, r3, #2
+ 80009b6:	4413      	add	r3, r2
+ 80009b8:	f44f 72fa 	mov.w	r2, #500	; 0x1f4
+ 80009bc:	809a      	strh	r2, [r3, #4]
+ 80009be:	e01d      	b.n	80009fc <handle_new_command_timeout+0x78>
+	}
+
+	else if (string_equals("medium", cmd)) {
+ 80009c0:	493a      	ldr	r1, [pc, #232]	; (8000aac <handle_new_command_timeout+0x128>)
+ 80009c2:	483c      	ldr	r0, [pc, #240]	; (8000ab4 <handle_new_command_timeout+0x130>)
+ 80009c4:	f000 fc6a 	bl	800129c <string_equals>
+ 80009c8:	4603      	mov	r3, r0
+ 80009ca:	2b00      	cmp	r3, #0
+ 80009cc:	d006      	beq.n	80009dc <handle_new_command_timeout+0x58>
+		new_mode.states[state_idx].timeout = MEDIUM;
+ 80009ce:	79fb      	ldrb	r3, [r7, #7]
+ 80009d0:	4a34      	ldr	r2, [pc, #208]	; (8000aa4 <handle_new_command_timeout+0x120>)
+ 80009d2:	009b      	lsls	r3, r3, #2
+ 80009d4:	4413      	add	r3, r2
+ 80009d6:	22fa      	movs	r2, #250	; 0xfa
+ 80009d8:	809a      	strh	r2, [r3, #4]
+ 80009da:	e00f      	b.n	80009fc <handle_new_command_timeout+0x78>
+	}
+
+	else if (string_equals("fast", cmd)) {
+ 80009dc:	4933      	ldr	r1, [pc, #204]	; (8000aac <handle_new_command_timeout+0x128>)
+ 80009de:	4836      	ldr	r0, [pc, #216]	; (8000ab8 <handle_new_command_timeout+0x134>)
+ 80009e0:	f000 fc5c 	bl	800129c <string_equals>
+ 80009e4:	4603      	mov	r3, r0
+ 80009e6:	2b00      	cmp	r3, #0
+ 80009e8:	d006      	beq.n	80009f8 <handle_new_command_timeout+0x74>
+		new_mode.states[state_idx].timeout = FAST;
+ 80009ea:	79fb      	ldrb	r3, [r7, #7]
+ 80009ec:	4a2d      	ldr	r2, [pc, #180]	; (8000aa4 <handle_new_command_timeout+0x120>)
+ 80009ee:	009b      	lsls	r3, r3, #2
+ 80009f0:	4413      	add	r3, r2
+ 80009f2:	2264      	movs	r2, #100	; 0x64
+ 80009f4:	809a      	strh	r2, [r3, #4]
+ 80009f6:	e001      	b.n	80009fc <handle_new_command_timeout+0x78>
+	}
+
+	else {
 		return false;
  80009f8:	2300      	movs	r3, #0
  80009fa:	e04f      	b.n	8000a9c <handle_new_command_timeout+0x118>
 	}
+
 	--remaining_timeouts_input;
  80009fc:	4b2a      	ldr	r3, [pc, #168]	; (8000aa8 <handle_new_command_timeout+0x124>)
  80009fe:	781b      	ldrb	r3, [r3, #0]
@@ -1058,6 +1066,7 @@ bool handle_new_command_timeout() {
  8000a02:	b2da      	uxtb	r2, r3
  8000a04:	4b28      	ldr	r3, [pc, #160]	; (8000aa8 <handle_new_command_timeout+0x124>)
  8000a06:	701a      	strb	r2, [r3, #0]
+
 	if (remaining_timeouts_input == 0) {
  8000a08:	4b27      	ldr	r3, [pc, #156]	; (8000aa8 <handle_new_command_timeout+0x124>)
  8000a0a:	781b      	ldrb	r3, [r3, #0]
@@ -1083,10 +1092,12 @@ bool handle_new_command_timeout() {
  8000a36:	b2da      	uxtb	r2, r3
  8000a38:	4b20      	ldr	r3, [pc, #128]	; (8000abc <handle_new_command_timeout+0x138>)
  8000a3a:	701a      	strb	r2, [r3, #0]
+
 		const uint8_t mode_idx = adding_mode;
  8000a3c:	4b1f      	ldr	r3, [pc, #124]	; (8000abc <handle_new_command_timeout+0x138>)
  8000a3e:	781b      	ldrb	r3, [r3, #0]
  8000a40:	71bb      	strb	r3, [r7, #6]
+
 		memcpy(modes + mode_idx, &(new_mode), sizeof(new_mode));
  8000a42:	79ba      	ldrb	r2, [r7, #6]
  8000a44:	4613      	mov	r3, r2
@@ -1100,12 +1111,14 @@ bool handle_new_command_timeout() {
  8000a54:	4913      	ldr	r1, [pc, #76]	; (8000aa4 <handle_new_command_timeout+0x120>)
  8000a56:	4618      	mov	r0, r3
  8000a58:	f002 fc3c 	bl	80032d4 <memcpy>
+
 		print_format("The mode %d is created\r\n", mode_idx + 1);
  8000a5c:	79bb      	ldrb	r3, [r7, #6]
  8000a5e:	3301      	adds	r3, #1
  8000a60:	4619      	mov	r1, r3
  8000a62:	4819      	ldr	r0, [pc, #100]	; (8000ac8 <handle_new_command_timeout+0x144>)
  8000a64:	f7ff fe72 	bl	800074c <print_format>
+
 		current_max_mode = (current_max_mode < MAX_MODES_COUNT - 1) ? adding_mode : current_max_mode;
  8000a68:	4b18      	ldr	r3, [pc, #96]	; (8000acc <handle_new_command_timeout+0x148>)
  8000a6a:	781b      	ldrb	r3, [r3, #0]
@@ -1118,22 +1131,26 @@ bool handle_new_command_timeout() {
  8000a78:	781b      	ldrb	r3, [r3, #0]
  8000a7a:	4a14      	ldr	r2, [pc, #80]	; (8000acc <handle_new_command_timeout+0x148>)
  8000a7c:	7013      	strb	r3, [r2, #0]
+
 		return true;
  8000a7e:	2301      	movs	r3, #1
  8000a80:	e00c      	b.n	8000a9c <handle_new_command_timeout+0x118>
 	}
+
 	print_format("Added mode: %d \r\n", adding_mode);
  8000a82:	4b0e      	ldr	r3, [pc, #56]	; (8000abc <handle_new_command_timeout+0x138>)
  8000a84:	781b      	ldrb	r3, [r3, #0]
  8000a86:	4619      	mov	r1, r3
  8000a88:	4811      	ldr	r0, [pc, #68]	; (8000ad0 <handle_new_command_timeout+0x14c>)
  8000a8a:	f7ff fe5f 	bl	800074c <print_format>
+
 	print_format("%d timeouts are remaining:\r\n", remaining_timeouts_input);
  8000a8e:	4b06      	ldr	r3, [pc, #24]	; (8000aa8 <handle_new_command_timeout+0x124>)
  8000a90:	781b      	ldrb	r3, [r3, #0]
  8000a92:	4619      	mov	r1, r3
  8000a94:	480f      	ldr	r0, [pc, #60]	; (8000ad4 <handle_new_command_timeout+0x150>)
  8000a96:	f7ff fe59 	bl	800074c <print_format>
+
 	return true;
  8000a9a:	2301      	movs	r3, #1
 }
@@ -1144,22 +1161,18 @@ bool handle_new_command_timeout() {
  8000aa4:	200001f0 	.word	0x200001f0
  8000aa8:	200001ec 	.word	0x200001ec
  8000aac:	200001a0 	.word	0x200001a0
- 8000ab0:	08004608 	.word	0x08004608
- 8000ab4:	08004610 	.word	0x08004610
- 8000ab8:	08004618 	.word	0x08004618
+ 8000ab0:	08004618 	.word	0x08004618
+ 8000ab4:	08004620 	.word	0x08004620
+ 8000ab8:	08004628 	.word	0x08004628
  8000abc:	20000000 	.word	0x20000000
  8000ac0:	20000001 	.word	0x20000001
  8000ac4:	20000004 	.word	0x20000004
- 8000ac8:	08004620 	.word	0x08004620
+ 8000ac8:	08004630 	.word	0x08004630
  8000acc:	20000002 	.word	0x20000002
- 8000ad0:	0800463c 	.word	0x0800463c
- 8000ad4:	08004650 	.word	0x08004650
+ 8000ad0:	0800464c 	.word	0x0800464c
+ 8000ad4:	08004660 	.word	0x08004660
 
 08000ad8 <handle_command_line>:
-	SET_INTERRUPTS_OFF,
-	SET_X,
-	NEW_X,
-};
 
 void handle_command_line() {
  8000ad8:	b5f0      	push	{r4, r5, r6, r7, lr}
@@ -1295,16 +1308,16 @@ void handle_command_line() {
  8000bbc:	46bd      	mov	sp, r7
  8000bbe:	bdf0      	pop	{r4, r5, r6, r7, pc}
  8000bc0:	200001a0 	.word	0x200001a0
- 8000bc4:	08004670 	.word	0x08004670
+ 8000bc4:	08004680 	.word	0x08004680
  8000bc8:	200001e5 	.word	0x200001e5
  8000bcc:	200006d8 	.word	0x200006d8
- 8000bd0:	08004684 	.word	0x08004684
- 8000bd4:	08004698 	.word	0x08004698
+ 8000bd0:	08004694 	.word	0x08004694
+ 8000bd4:	080046a8 	.word	0x080046a8
  8000bd8:	20000214 	.word	0x20000214
- 8000bdc:	080046a0 	.word	0x080046a0
+ 8000bdc:	080046b0 	.word	0x080046b0
  8000be0:	200001ec 	.word	0x200001ec
- 8000be4:	080046c0 	.word	0x080046c0
- 8000be8:	080046c4 	.word	0x080046c4
+ 8000be4:	080046d0 	.word	0x080046d0
+ 8000be8:	080046d4 	.word	0x080046d4
 
 08000bec <receive_char_async>:
 
@@ -1337,11 +1350,11 @@ bool receive_char() {
  8000c16:	f001 fcda 	bl	80025ce <HAL_UART_Receive>
  8000c1a:	4603      	mov	r3, r0
  8000c1c:	607b      	str	r3, [r7, #4]
-		&huart6,
 		(uint8_t*) &last_received_char,
 		sizeof(last_received_char),
 		UART_TIMEOUT
 	);
+
 	return result == HAL_OK;
  8000c1e:	687b      	ldr	r3, [r7, #4]
  8000c20:	2b00      	cmp	r3, #0
@@ -1521,11 +1534,11 @@ void readln() {
  8000d2e:	bdf0      	pop	{r4, r5, r6, r7, pc}
  8000d30:	200001e5 	.word	0x200001e5
  8000d34:	200001e6 	.word	0x200001e6
- 8000d38:	080046a8 	.word	0x080046a8
+ 8000d38:	080046b8 	.word	0x080046b8
  8000d3c:	20000214 	.word	0x20000214
  8000d40:	200001a0 	.word	0x200001a0
- 8000d44:	080046c4 	.word	0x080046c4
- 8000d48:	080046ac 	.word	0x080046ac
+ 8000d44:	080046d4 	.word	0x080046d4
+ 8000d48:	080046bc 	.word	0x080046bc
 
 08000d4c <main>:
 /**
@@ -1738,7 +1751,7 @@ int main(void)
  8000ea0:	20000001 	.word	0x20000001
  8000ea4:	20000214 	.word	0x20000214
  8000ea8:	20000004 	.word	0x20000004
- 8000eac:	080046d4 	.word	0x080046d4
+ 8000eac:	080046e4 	.word	0x080046e4
 
 08000eb0 <SystemClock_Config>:
 /**
@@ -2739,7 +2752,7 @@ LoopFillZerobss:
   ldr r1, =_edata
  80013a4:	20000184 	.word	0x20000184
   ldr r2, =_sidata
- 80013a8:	080048bc 	.word	0x080048bc
+ 80013a8:	080048cc 	.word	0x080048cc
   ldr r2, =_sbss
  80013ac:	20000184 	.word	0x20000184
   ldr r4, =_ebss
@@ -5331,7 +5344,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  8002206:	bf00      	nop
  8002208:	40023c00 	.word	0x40023c00
  800220c:	40023800 	.word	0x40023800
- 8002210:	080046e4 	.word	0x080046e4
+ 8002210:	080046f4 	.word	0x080046f4
  8002214:	20000114 	.word	0x20000114
  8002218:	20000118 	.word	0x20000118
 
@@ -5586,7 +5599,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  80023dc:	4618      	mov	r0, r3
  80023de:	bd80      	pop	{r7, pc}
  80023e0:	40023800 	.word	0x40023800
- 80023e4:	080046f4 	.word	0x080046f4
+ 80023e4:	08004704 	.word	0x08004704
 
 080023e8 <HAL_RCC_GetPCLK2Freq>:
   * @note   Each time PCLK2 changes, this function must be called to update the
@@ -5612,7 +5625,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
  8002404:	4618      	mov	r0, r3
  8002406:	bd80      	pop	{r7, pc}
  8002408:	40023800 	.word	0x40023800
- 800240c:	080046f4 	.word	0x080046f4
+ 800240c:	08004704 	.word	0x08004704
 
 08002410 <HAL_UART_Init>:
   * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
@@ -7927,10 +7940,10 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  80032be:	4798      	blx	r3
  80032c0:	3601      	adds	r6, #1
  80032c2:	e7f2      	b.n	80032aa <__libc_init_array+0x1e>
- 80032c4:	080048b4 	.word	0x080048b4
- 80032c8:	080048b4 	.word	0x080048b4
- 80032cc:	080048b4 	.word	0x080048b4
- 80032d0:	080048b8 	.word	0x080048b8
+ 80032c4:	080048c4 	.word	0x080048c4
+ 80032c8:	080048c4 	.word	0x080048c4
+ 80032cc:	080048c4 	.word	0x080048c4
+ 80032d0:	080048c8 	.word	0x080048c8
 
 080032d4 <memcpy>:
  80032d4:	440a      	add	r2, r1
@@ -8345,11 +8358,11 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8003694:	f000 fa4c 	bl	8003b30 <_printf_i>
  8003698:	e7eb      	b.n	8003672 <_svfiprintf_r+0x1c2>
  800369a:	bf00      	nop
- 800369c:	080046fc 	.word	0x080046fc
- 80036a0:	08004706 	.word	0x08004706
+ 800369c:	0800470c 	.word	0x0800470c
+ 80036a0:	08004716 	.word	0x08004716
  80036a4:	00000000 	.word	0x00000000
  80036a8:	080033f9 	.word	0x080033f9
- 80036ac:	08004702 	.word	0x08004702
+ 80036ac:	08004712 	.word	0x08004712
 
 080036b0 <_sungetc_r>:
  80036b0:	b538      	push	{r3, r4, r5, lr}
@@ -8712,8 +8725,8 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8003a0e:	e7ab      	b.n	8003968 <__ssvfiscanf_r+0x204>
  8003a10:	080036b1 	.word	0x080036b1
  8003a14:	0800372b 	.word	0x0800372b
- 8003a18:	0800474b 	.word	0x0800474b
- 8003a1c:	08004702 	.word	0x08004702
+ 8003a18:	0800475b 	.word	0x0800475b
+ 8003a1c:	08004712 	.word	0x08004712
  8003a20:	4b0b      	ldr	r3, [pc, #44]	; (8003a50 <__ssvfiscanf_r+0x2ec>)
  8003a22:	2b00      	cmp	r3, #0
  8003a24:	f43f aec5 	beq.w	80037b2 <__ssvfiscanf_r+0x4e>
@@ -9068,8 +9081,8 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8003d6c:	f104 0619 	add.w	r6, r4, #25
  8003d70:	e7f5      	b.n	8003d5e <_printf_i+0x22e>
  8003d72:	bf00      	nop
- 8003d74:	0800470d 	.word	0x0800470d
- 8003d78:	0800471e 	.word	0x0800471e
+ 8003d74:	0800471d 	.word	0x0800471d
+ 8003d78:	0800472e 	.word	0x0800472e
 
 08003d7c <_scanf_chars>:
  8003d7c:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -9152,7 +9165,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8003e24:	2000      	movs	r0, #0
  8003e26:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
  8003e2a:	bf00      	nop
- 8003e2c:	0800474b 	.word	0x0800474b
+ 8003e2c:	0800475b 	.word	0x0800475b
 
 08003e30 <_scanf_i>:
  8003e30:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -9348,10 +9361,10 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  800400a:	e7e6      	b.n	8003fda <_scanf_i+0x1aa>
  800400c:	2001      	movs	r0, #1
  800400e:	e7ed      	b.n	8003fec <_scanf_i+0x1bc>
- 8004010:	080046b4 	.word	0x080046b4
+ 8004010:	080046c4 	.word	0x080046c4
  8004014:	0800427d 	.word	0x0800427d
  8004018:	08004195 	.word	0x08004195
- 800401c:	08004748 	.word	0x08004748
+ 800401c:	08004758 	.word	0x08004758
 
 08004020 <__sccl>:
  8004020:	b570      	push	{r4, r5, r6, lr}
@@ -9510,7 +9523,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  800418a:	230a      	movs	r3, #10
  800418c:	e7ab      	b.n	80040e6 <_strtol_l.constprop.0+0x56>
  800418e:	bf00      	nop
- 8004190:	0800474b 	.word	0x0800474b
+ 8004190:	0800475b 	.word	0x0800475b
 
 08004194 <_strtol_r>:
  8004194:	f7ff bf7c 	b.w	8004090 <_strtol_l.constprop.0>
@@ -9608,7 +9621,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8004272:	230a      	movs	r3, #10
  8004274:	e7af      	b.n	80041d6 <_strtoul_l.constprop.0+0x3e>
  8004276:	bf00      	nop
- 8004278:	0800474b 	.word	0x0800474b
+ 8004278:	0800475b 	.word	0x0800475b
 
 0800427c <_strtoul_r>:
  800427c:	f7ff bf8c 	b.w	8004198 <_strtoul_l.constprop.0>

@@ -336,10 +336,15 @@ bool handle_new_command_timeout() {
 
 	if (remaining_timeouts_input == 0) {
 		adding_mode = CONST_MODES_COUNT + (adding_mode + 1 - CONST_MODES_COUNT) % (MAX_MODES_COUNT - CONST_MODES_COUNT + 1);
+
 		const uint8_t mode_idx = adding_mode;
+
 		memcpy(modes + mode_idx, &(new_mode), sizeof(new_mode));
+
 		print_format("The mode %d is created\r\n", mode_idx + 1);
+
 		current_max_mode = (current_max_mode < MAX_MODES_COUNT - 1) ? adding_mode : current_max_mode;
+
 		return true;
 	}
 
@@ -349,13 +354,6 @@ bool handle_new_command_timeout() {
 
 	return true;
 }
-
-enum Command {
-	SET_INTERRUPTS_ON,
-	SET_INTERRUPTS_OFF,
-	SET_X,
-	NEW_X,
-};
 
 void handle_command_line() {
 	bool success = false;
@@ -406,6 +404,7 @@ bool receive_char() {
 		sizeof(last_received_char),
 		UART_TIMEOUT
 	);
+
 	return result == HAL_OK;
 }
 
