@@ -957,15 +957,18 @@ bool handle_new_command() {
  8000956:	429a      	cmp	r2, r3
  8000958:	d8aa      	bhi.n	80008b0 <handle_new_command+0x30>
 		}
+
 	remaining_timeouts_input = pattern_length;
  800095a:	687b      	ldr	r3, [r7, #4]
  800095c:	b2da      	uxtb	r2, r3
  800095e:	4b07      	ldr	r3, [pc, #28]	; (800097c <handle_new_command+0xfc>)
  8000960:	701a      	strb	r2, [r3, #0]
+
 	print_format("Creating new mode with length of %d. Please specify timeouts for each state (slow, medium, fast):\r\n", pattern_length);
  8000962:	6879      	ldr	r1, [r7, #4]
  8000964:	4806      	ldr	r0, [pc, #24]	; (8000980 <handle_new_command+0x100>)
  8000966:	f7ff fef1 	bl	800074c <print_format>
+
 	return true;
  800096a:	2301      	movs	r3, #1
 }
