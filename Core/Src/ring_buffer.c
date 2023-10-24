@@ -3,7 +3,7 @@
 #include <usart.h>
 
 #define TIMEOUT_DEF 500
-
+//UART_HandleTypeDef huart6;
 uint16_t timeout;
 
 ring_buffer rx_buffer = { { 0 }, 0, 0};
@@ -13,6 +13,7 @@ ring_buffer *_rx_buffer;
 ring_buffer *_tx_buffer;
 
 void store_char(unsigned char c, ring_buffer *buffer);
+
 
 void ring_buffer_init(void) {
   _rx_buffer = &rx_buffer;
@@ -31,7 +32,9 @@ void store_char(unsigned char c, ring_buffer *buffer) {
 int buf_read(void) {
   if(_rx_buffer->head == _rx_buffer->tail) {
     return -1;
-  } else {
+  }
+  else
+  {
     unsigned char c = _rx_buffer->buffer[_rx_buffer->tail];
     _rx_buffer->tail = (unsigned int)(_rx_buffer->tail + 1) % UART_BUFFER_SIZE;
     return c;
