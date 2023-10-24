@@ -1513,7 +1513,7 @@ void readln() {
  8000d0a:	f7ff fa7b 	bl	8000204 <strlen>
  8000d0e:	6078      	str	r0, [r7, #4]
 
-    // check overflow
+    // check buffer overflow
     if (command_line_length == sizeof(cmd) - 1) {
  8000d10:	687b      	ldr	r3, [r7, #4]
  8000d12:	2b3f      	cmp	r3, #63	; 0x3f

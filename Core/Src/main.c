@@ -455,7 +455,7 @@ void readln() {
     }
     const uint32_t command_line_length = strlen(cmd);
 
-    // check overflow
+    // check buffer overflow
     if (command_line_length == sizeof(cmd) - 1) {
     	print_format("\r\n %s", WRONG_COMMAND);
     	clear_buffer();
