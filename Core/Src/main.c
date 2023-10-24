@@ -399,7 +399,11 @@ void handle_command_line() {
 }
 
 void receive_char_async() {
-	HAL_UART_Receive_IT(&huart6, (uint8_t*) &last_received_char, sizeof(last_received_char));
+	HAL_UART_Receive_IT(
+		&huart6,
+		(uint8_t*) &last_received_char,
+		sizeof(last_received_char)
+	);
 }
 
 bool receive_char() {

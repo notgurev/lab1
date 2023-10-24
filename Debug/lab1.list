@@ -1317,11 +1317,15 @@ void handle_command_line() {
 void receive_char_async() {
  8000bc0:	b580      	push	{r7, lr}
  8000bc2:	af00      	add	r7, sp, #0
-	HAL_UART_Receive_IT(&huart6, (uint8_t*) &last_received_char, sizeof(last_received_char));
+	HAL_UART_Receive_IT(
  8000bc4:	2201      	movs	r2, #1
  8000bc6:	4903      	ldr	r1, [pc, #12]	; (8000bd4 <receive_char_async+0x14>)
  8000bc8:	4803      	ldr	r0, [pc, #12]	; (8000bd8 <receive_char_async+0x18>)
  8000bca:	f001 fdc3 	bl	8002754 <HAL_UART_Receive_IT>
+		&huart6,
+		(uint8_t*) &last_received_char,
+		sizeof(last_received_char)
+	);
 }
  8000bce:	bf00      	nop
  8000bd0:	bd80      	pop	{r7, pc}
