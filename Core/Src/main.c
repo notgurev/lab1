@@ -34,8 +34,6 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-typedef char* string;
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -99,8 +97,6 @@ int main(void)
 
   const int MODES_LEN = 4;
 
-  string s = "hello\n";
-
   struct GarlandMode modes[] = {
 		  // Green and yellow, simultaneously
   		  {
@@ -126,13 +122,37 @@ int main(void)
 
   uint32_t last_pressed_time = 0;
 
+//  char s[] = "Hello world\n\r";
+//  char c;
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
+  // TODO
+  // new xyz...	x = g/r/y/n от 2 до 8, окончание ввода по вводу 8 символов или enter
+  // затем приглашение к вводу периода, fast/normal/slow
+  // затем вывести номер сохраненной последователньости
+
+  // set x - сделать активной последовательность мерцаний х, где х – порядковый номер;
+
+  // set interrupts on или set interrupts off – включить или выключить прерывания.
+
   while (1) {
+//	  while (1) {
+//		  if (HAL_OK == HAL_UART_Receive(&huart6, (uint8_t*)&c, 1, 1)) {
+//			  switch (c) {
+//			  case '!':
+//				  HAL_UART_Transmit(&huart6, (uint8_t*)s, sizeof(s), 10);
+//				  break;
+//			  default:
+//				  HAL_UART_Transmit(&huart6, (uint8_t*)&c, 1, 10);
+//				  break;
+//			  }
+//		  }
+//	  }
+
 	  GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
 
 	  reset_LEDs();
