@@ -1,4 +1,4 @@
-../Core/Src/ring_buffer.c:14:6:ring_buffer_init	152	static
+../Core/Src/ring_buffer.c:17:6:ring_buffer_init	4	static
 ../Core/Src/ring_buffer.c:22:6:store_char	24	static
 ../Core/Src/ring_buffer.c:31:5:buf_read	16	static
 ../Core/Src/ring_buffer.c:41:6:buf_write	24	static

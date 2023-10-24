@@ -22,6 +22,12 @@ void set_red_led(bool on) {
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
 }
 
+void set_no_one_led(bool on) {
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
+}
+
 bool string_equals(const char * a, const char * b) {
 	return strcmp(a, b) == 0;
 }

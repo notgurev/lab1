@@ -3,8 +3,9 @@
 ../Core/Src/utils.c:13:6:set_green_led	16	static
 ../Core/Src/utils.c:17:6:set_yellow_led	16	static
 ../Core/Src/utils.c:21:6:set_red_led	16	static
-../Core/Src/utils.c:25:6:string_equals	16	static
-../Core/Src/utils.c:29:6:starts_with	16	static
-../Core/Src/utils.c:34:6:sleep	16	static
-../Core/Src/utils.c:41:6:is_btn_pressed	32	static
-../Core/Src/utils.c:67:6:reset_LEDs	8	static
+../Core/Src/utils.c:25:6:set_no_one_led	16	static
+../Core/Src/utils.c:31:6:string_equals	16	static
+../Core/Src/utils.c:35:6:starts_with	16	static
+../Core/Src/utils.c:40:6:sleep	16	static
+../Core/Src/utils.c:47:6:is_btn_pressed	32	static
+../Core/Src/utils.c:73:6:reset_LEDs	8	static

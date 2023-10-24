@@ -6,15 +6,15 @@
 
 uint16_t timeout;
 
+ring_buffer rx_buffer = { { 0 }, 0, 0};
+ring_buffer tx_buffer = { { 0 }, 0, 0};
+
 ring_buffer *_rx_buffer;
 ring_buffer *_tx_buffer;
 
 void store_char(unsigned char c, ring_buffer *buffer);
 
 void ring_buffer_init(void) {
-  ring_buffer rx_buffer = { { 0 }, 0, 0};
-  ring_buffer tx_buffer = { { 0 }, 0, 0};
-
   _rx_buffer = &rx_buffer;
   _tx_buffer = &tx_buffer;
 }

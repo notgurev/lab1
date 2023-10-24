@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 void toggle_LED(int code);
 
 void set_LED(int code, GPIO_PinState state);
