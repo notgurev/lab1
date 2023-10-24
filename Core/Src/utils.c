@@ -10,6 +10,26 @@ void set_LED(int code, GPIO_PinState state) {
 	HAL_GPIO_WritePin(GPIOD, code, state);
 }
 
+void set_green_led(bool on) {
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+void set_yellow_led(bool on) {
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+void set_red_led(bool on) {
+	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+}
+
+bool string_equals(const char * a, const char * b) {
+	return strcmp(a, b) == 0;
+}
+
+bool starts_with(const char * prefix, const char * str) {
+	return strncmp(prefix, str, strlen(prefix)) == 0;
+}
+
 // Sleeps for ms milliseconds
 void sleep(int ms) {
 	HAL_Delay(ms);

@@ -6,6 +6,14 @@ void reset_LEDs();
 
 bool is_btn_pressed(uint32_t* last_pressed_time);
 
+void set_green_led(bool on);
+void set_yellow_led(bool on);
+void set_red_led(bool on);
+void set_no_one_led(bool on);
+
+bool string_equals(const char * a, const char * b);
+bool starts_with(const char * prefix, const char * str);
+
 void sleep(int ms);
 
 #define WAIT -1
