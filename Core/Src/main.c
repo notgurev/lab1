@@ -360,42 +360,42 @@ bool handle_new_command_timeout() {
 
 void handle_command_line() {
 	bool success = false;
-	if (strlen(cmd) != 0) {
-		if (string_equals("set interrupts on", cmd)) {
-			is_interrupt_mode = true;
-			HAL_UART_AbortReceive(&huart6);
-			HAL_UART_Abort_IT(&huart6);
-			success = true;
-		}
 
-		else if (string_equals("set interrupts off", cmd)) {
-			is_interrupt_mode = false;
-			HAL_UART_AbortReceive(&huart6);
-			HAL_UART_Abort_IT(&huart6);
-			success = true;
-		}
-
-		else if (starts_with("set ", cmd)) {
-			success = handle_set_command(last_state);
-		}
-
-		else if (starts_with("new ", cmd)) {
-			success = handle_new_command(last_state);
-			if (success) {
-				return;
-			}
-		}
-
-		else if (remaining_timeouts_input > 0) {
-			success = handle_new_command_timeout();
-		}
-
-		else {
-			success = false;
-		}
-
-		println(success ? OK_MESSAGE : WRONG_COMMAND);
+	if (strlen(cmd) == 0) {
+		return; // empty line
 	}
+
+	if (string_equals("set interrupts on", cmd)) {
+		is_interrupt_mode = true;
+		HAL_UART_AbortReceive(&huart6);
+		HAL_UART_Abort_IT(&huart6);
+		success = true;
+	}
+
+	else if (string_equals("set interrupts off", cmd)) {
+		is_interrupt_mode = false;
+		HAL_UART_AbortReceive(&huart6);
+		HAL_UART_Abort_IT(&huart6);
+		success = true;
+	}
+
+	else if (starts_with("set ", cmd)) {
+		success = handle_set_command(last_state);
+	}
+
+	else if (starts_with("new ", cmd)) {
+		success = handle_new_command(last_state);
+	}
+
+	else if (remaining_timeouts_input > 0) {
+		success = handle_new_command_timeout();
+	}
+
+	else {
+		success = false;
+	}
+
+	println(success ? OK_MESSAGE : WRONG_COMMAND);
 }
 
 void receive_char_async() {
