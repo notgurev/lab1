@@ -380,11 +380,11 @@ void handle_command_line() {
 	}
 
 	else if (starts_with("set ", cmd)) {
-		success = handle_set_command(last_state);
+		success = handle_set_command();
 	}
 
 	else if (starts_with("new ", cmd)) {
-		success = handle_new_command(last_state);
+		success = handle_new_command();
 	}
 
 	else if (remaining_timeouts_input > 0) {
@@ -449,7 +449,7 @@ void readln() {
     	// enter
     	case '\r':
     	    println("\n");
-    		handle_command_line(last_state);
+    		handle_command_line();
     		clear_buffer();
     		return;
     }
