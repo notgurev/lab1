@@ -2483,9 +2483,9 @@ void MX_USART6_UART_Init(void)
  8001200:	4b11      	ldr	r3, [pc, #68]	; (8001248 <MX_USART6_UART_Init+0x4c>)
  8001202:	4a12      	ldr	r2, [pc, #72]	; (800124c <MX_USART6_UART_Init+0x50>)
  8001204:	601a      	str	r2, [r3, #0]
-  huart6.Init.BaudRate = 115200;
+  huart6.Init.BaudRate = 38400;
  8001206:	4b10      	ldr	r3, [pc, #64]	; (8001248 <MX_USART6_UART_Init+0x4c>)
- 8001208:	f44f 32e1 	mov.w	r2, #115200	; 0x1c200
+ 8001208:	f44f 4216 	mov.w	r2, #38400	; 0x9600
  800120c:	605a      	str	r2, [r3, #4]
   huart6.Init.WordLength = UART_WORDLENGTH_8B;
  800120e:	4b0e      	ldr	r3, [pc, #56]	; (8001248 <MX_USART6_UART_Init+0x4c>)
