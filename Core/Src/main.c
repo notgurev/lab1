@@ -304,8 +304,11 @@ bool handle_new_command() {
 			default:
 				return false;
 		}
+
 	remaining_timeouts_input = pattern_length;
+
 	print_format("Creating new mode with length of %d. Please specify timeouts for each state (slow, medium, fast):\r\n", pattern_length);
+
 	return true;
 }
 
@@ -377,8 +380,10 @@ void handle_command_line() {
 		}
 
 		else if (starts_with("new ", cmd)) {
-			handle_new_command(last_state);
-			return;
+			success = handle_new_command(last_state);
+			if (success) {
+				return;
+			}
 		}
 
 		else if (remaining_timeouts_input > 0) {
