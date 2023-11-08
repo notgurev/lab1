@@ -78,6 +78,10 @@ int index_char = 0;
 const char NEWLINE_CHAR = '\r';
 const char BACKSPACE_CHAR = '\177';
 
+const int FAST_SPEED = 200;
+const int MEDIUM_SPEED = 500;
+const int SLOW_SPEED = 1000;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -186,10 +190,19 @@ int add_mode(int code[], int size, int delay) {
 }
 
 int handle_delay_input() {
-	if (strcmp(cmd, "1") == 0) return 200;
-	else if (strcmp(cmd, "2") == 0) return 500;
-	else if (strcmp(cmd, "3") == 0) return 1000;
-	else return -1;
+	if (strcmp(cmd, "fast") == 0 || strcmp(cmd, "f") == 0) {
+		 return FAST_SPEED;
+	}
+
+	if (strcmp(cmd, "medium") == 0 || strcmp(cmd, "m") == 0) {
+		return MEDIUM_SPEED;
+	}
+
+	if (strcmp(cmd, "slow") == 0 || strcmp(cmd, "s") == 0) {
+		return SLOW_SPEED;
+	}
+
+	return -1;
 }
 
 
@@ -250,7 +263,7 @@ void execute_command() {
 	if (strstr(cmd, "new ") == cmd) {
 		new_mode_length = parse_mode(&cmd[4]);
 		if (new_mode_length != -1){
-			print("Input delay: 1,2 or 3 where 1 = 200ms; 2 = 500ms; 3 = 1000ms: ");
+			print("Input delay: fast/f (200 ms), medium/m (500 ms), slow (1000 ms): ");
 			expecting_delay_input = true;
 		} else {
 			print("Invalid parameter\r\n");
