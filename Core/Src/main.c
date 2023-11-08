@@ -50,7 +50,7 @@
 
 uint32_t PINS[] = {GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15};
 
-struct Mode MODES[] = {
+struct Mode modes[] = {
 		  { { LED_GREEN, LED_YELLOW}, 2, 1000, 0},
 		  { { LED_GREEN, LED_RED}, 2, 200, 0},
 		  { { LED_YELLOW, LED_RED}, 2, 200, 0},
@@ -184,7 +184,7 @@ int add_mode(int code[], int size, int delay) {
 
 	modes_size++;
 
-	MODES[index_last_changed_mode] = new_mode;
+	modes[index_last_changed_mode] = new_mode;
 
 	return index_last_changed_mode;
 }
@@ -370,7 +370,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  bool switched = activate_mode(&MODES[cur_mode_index]);
+	  bool switched = activate_mode(&modes[cur_mode_index]);
 
 	  if (switched) {
 	  		cur_mode_index++;

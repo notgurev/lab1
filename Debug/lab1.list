@@ -1278,7 +1278,7 @@ int add_mode(int code[], int size, int delay) {
  8000b06:	4a0e      	ldr	r2, [pc, #56]	; (8000b40 <add_mode+0xa4>)
  8000b08:	6013      	str	r3, [r2, #0]
 
-	MODES[index_last_changed_mode] = new_mode;
+	modes[index_last_changed_mode] = new_mode;
  8000b0a:	4b0c      	ldr	r3, [pc, #48]	; (8000b3c <add_mode+0xa0>)
  8000b0c:	681b      	ldr	r3, [r3, #0]
  8000b0e:	4a0d      	ldr	r2, [pc, #52]	; (8000b44 <add_mode+0xa8>)
@@ -1908,7 +1908,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  bool switched = activate_mode(&MODES[cur_mode_index]);
+	  bool switched = activate_mode(&modes[cur_mode_index]);
  8000f5a:	4b0f      	ldr	r3, [pc, #60]	; (8000f98 <main+0x58>)
  8000f5c:	681b      	ldr	r3, [r3, #0]
  8000f5e:	222c      	movs	r2, #44	; 0x2c

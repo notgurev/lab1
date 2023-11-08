@@ -3370,8 +3370,8 @@ LOAD c:/programs/stm32cubeide/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
  *(.data*)
  .data.PINS     0x0000000020000000        0xc ./Core/Src/main.o
                 0x0000000020000000                PINS
- .data.MODES    0x000000002000000c      0x160 ./Core/Src/main.o
-                0x000000002000000c                MODES
+ .data.modes    0x000000002000000c      0x160 ./Core/Src/main.o
+                0x000000002000000c                modes
  .data.modes_size
                 0x000000002000016c        0x4 ./Core/Src/main.o
                 0x000000002000016c                modes_size
