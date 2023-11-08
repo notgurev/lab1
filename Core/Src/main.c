@@ -232,7 +232,7 @@ void execute_command() {
 
 	if (strcmp(cmd, "set interrupts on") == 0) {
 		interrupts_mode = true;
-		print("OK\r\n");
+		println("OK");
 		__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
 		__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
 		return;
@@ -261,12 +261,15 @@ void execute_command() {
 
 	if (strstr(cmd, "new ") == cmd) {
 		new_mode_length = parse_mode(&cmd[4]);
-		if (new_mode_length != -1){
-			print("Input delay: fast/f (200 ms), medium/m (500 ms), slow (1000 ms): ");
-			expecting_delay_input = true;
-		} else {
+
+		if (new_mode_length == -1) {
 			print("Invalid parameter\r\n");
+			return;
 		}
+
+		print("Input delay: fast/f (200 ms), medium/m (500 ms), slow (1000 ms): ");
+		expecting_delay_input = true;
+
 		return;
 	}
 
@@ -323,6 +326,13 @@ void print(const char * content) {
 	} else {
 		HAL_UART_Transmit(&huart6, (void *) content, strlen(content), TIMEOUT);
 	}
+}
+
+void println(const char * content) {
+	char buf[strlen(content) + 2];
+	strcat(buf, content);
+	strcat(buf, "\r\n");
+	print(buf);
 }
 
 /* USER CODE END 0 */
