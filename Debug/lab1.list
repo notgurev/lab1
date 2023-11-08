@@ -1071,18 +1071,18 @@ int parse_mode(const char *s) {
  80009ce:	bf00      	nop
  80009d0:	200002a8 	.word	0x200002a8
 
-080009d4 <clean_cmd>:
+080009d4 <clear_cmd>:
 
-void clean_cmd(){
+void clear_cmd() {
  80009d4:	b480      	push	{r7}
  80009d6:	b083      	sub	sp, #12
  80009d8:	af00      	add	r7, sp, #0
 	for (int j = 0; j < index_char; j++) {
  80009da:	2300      	movs	r3, #0
  80009dc:	607b      	str	r3, [r7, #4]
- 80009de:	e007      	b.n	80009f0 <clean_cmd+0x1c>
+ 80009de:	e007      	b.n	80009f0 <clear_cmd+0x1c>
 		cmd[j] = 0;
- 80009e0:	4a0a      	ldr	r2, [pc, #40]	; (8000a0c <clean_cmd+0x38>)
+ 80009e0:	4a0a      	ldr	r2, [pc, #40]	; (8000a0c <clear_cmd+0x38>)
  80009e2:	687b      	ldr	r3, [r7, #4]
  80009e4:	4413      	add	r3, r2
  80009e6:	2200      	movs	r2, #0
@@ -1091,15 +1091,15 @@ void clean_cmd(){
  80009ea:	687b      	ldr	r3, [r7, #4]
  80009ec:	3301      	adds	r3, #1
  80009ee:	607b      	str	r3, [r7, #4]
- 80009f0:	4b07      	ldr	r3, [pc, #28]	; (8000a10 <clean_cmd+0x3c>)
+ 80009f0:	4b07      	ldr	r3, [pc, #28]	; (8000a10 <clear_cmd+0x3c>)
  80009f2:	681b      	ldr	r3, [r3, #0]
  80009f4:	687a      	ldr	r2, [r7, #4]
  80009f6:	429a      	cmp	r2, r3
- 80009f8:	dbf2      	blt.n	80009e0 <clean_cmd+0xc>
+ 80009f8:	dbf2      	blt.n	80009e0 <clear_cmd+0xc>
 	}
 
 	index_char = 0;
- 80009fa:	4b05      	ldr	r3, [pc, #20]	; (8000a10 <clean_cmd+0x3c>)
+ 80009fa:	4b05      	ldr	r3, [pc, #20]	; (8000a10 <clear_cmd+0x3c>)
  80009fc:	2200      	movs	r2, #0
  80009fe:	601a      	str	r2, [r3, #0]
 }
@@ -1142,8 +1142,8 @@ void handle_data() {
  8000a36:	f000 f8bf 	bl	8000bb8 <execute_command>
 		}
 
-		clean_cmd();
- 8000a3a:	f7ff ffcb 	bl	80009d4 <clean_cmd>
+		clear_cmd();
+ 8000a3a:	f7ff ffcb 	bl	80009d4 <clear_cmd>
 		return;
  8000a3e:	e022      	b.n	8000a86 <handle_data+0x72>
 	}
@@ -1177,8 +1177,8 @@ void handle_data() {
 		print("\r\nBuffer overflow!\r\n");
  8000a68:	480b      	ldr	r0, [pc, #44]	; (8000a98 <handle_data+0x84>)
  8000a6a:	f000 fa19 	bl	8000ea0 <print>
-		clean_cmd();
- 8000a6e:	f7ff ffb1 	bl	80009d4 <clean_cmd>
+		clear_cmd();
+ 8000a6e:	f7ff ffb1 	bl	80009d4 <clear_cmd>
 		return;
  8000a72:	e008      	b.n	8000a86 <handle_data+0x72>
 	}

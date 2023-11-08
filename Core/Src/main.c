@@ -119,7 +119,7 @@ int parse_mode(const char *s) {
 	return (i > 1) ? i : -1;
 }
 
-void clean_cmd(){
+void clear_cmd() {
 	for (int j = 0; j < index_char; j++) {
 		cmd[j] = 0;
 	}
@@ -140,7 +140,7 @@ void handle_data() {
 			execute_command();
 		}
 
-		clean_cmd();
+		clear_cmd();
 		return;
 	}
 
@@ -151,7 +151,7 @@ void handle_data() {
 
 	if (index_char >= UART_BUFFER_SIZE) {
 		print("\r\nBuffer overflow!\r\n");
-		clean_cmd();
+		clear_cmd();
 		return;
 	}
 

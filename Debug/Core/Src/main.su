@@ -1,5 +1,5 @@
 ../Core/Src/main.c:92:5:parse_mode	24	static
-../Core/Src/main.c:122:6:clean_cmd	16	static
+../Core/Src/main.c:122:6:clear_cmd	16	static
 ../Core/Src/main.c:130:6:handle_data	8	static
 ../Core/Src/main.c:163:5:add_mode	32	static
 ../Core/Src/main.c:183:5:handle_delay_input	8	static

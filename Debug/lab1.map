@@ -3065,9 +3065,9 @@ LOAD c:/programs/stm32cubeide/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
  .text.parse_mode
                 0x00000000080008f4       0xe0 ./Core/Src/main.o
                 0x00000000080008f4                parse_mode
- .text.clean_cmd
+ .text.clear_cmd
                 0x00000000080009d4       0x40 ./Core/Src/main.o
-                0x00000000080009d4                clean_cmd
+                0x00000000080009d4                clear_cmd
  .text.handle_data
                 0x0000000008000a14       0x88 ./Core/Src/main.o
                 0x0000000008000a14                handle_data
