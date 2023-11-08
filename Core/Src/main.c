@@ -217,12 +217,10 @@ void execute_command() {
 
 		add_mode(buffer_mode, new_mode_length, delay);
 
-		char mode_number[1];
-		sprintf(mode_number, "%i", index_last_changed_mode + 1);
-
-		print("OK\r\nNumber of new mode: ");
-		print(mode_number);
-		print("\r\n");
+		const char* fmt = "OK\r\nNumber of new mode: %i\r\n";
+		char line[strlen(fmt)];
+		sprintf(line, fmt, index_last_changed_mode + 1);
+		print(line);
 
 		expecting_delay_input = false;
 
@@ -232,7 +230,7 @@ void execute_command() {
 
 	if (strcmp(cmd, "set interrupts on") == 0) {
 		interrupts_mode = true;
-		println("OK");
+		print("OK\r\n");
 		__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
 		__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
 		return;
@@ -326,13 +324,6 @@ void print(const char * content) {
 	} else {
 		HAL_UART_Transmit(&huart6, (void *) content, strlen(content), TIMEOUT);
 	}
-}
-
-void println(const char * content) {
-	char buf[strlen(content) + 2];
-	strcat(buf, content);
-	strcat(buf, "\r\n");
-	print(buf);
 }
 
 /* USER CODE END 0 */
