@@ -56,15 +56,11 @@
 
 /* USER CODE BEGIN PV */
 
-struct GarlandMode modes[] = {
+struct GarlandMode modes[MODES_LENGTH] = {
 		  { .code = { GREEN, YELLOW }, .size = 2, .delay = 1000, .current_code_index = 0},
 		  { { GREEN, RED }, 2, 200, 0},
 		  { { YELLOW, RED }, 2, 200, 0},
-		  { { NONE, YELLOW }, 2, 200, 0},
-		  { { NONE, NONE }, 2, 200, 0},
-		  { { NONE, NONE }, 2, 200, 0},
-		  { { NONE, NONE }, 2, 200, 0},
-		  { { NONE, NONE }, 2, 200, 0}
+		  { { NONE, YELLOW }, 2, 200, 0}
 };
 
 int cur_mode_index = 0;
@@ -171,7 +167,7 @@ void handle_data() {
 
 
 
-int add_mode(int code[], int size, int delay) {
+void add_mode(int code[], int size, int delay) {
 	index_last_changed_mode++;
 
 	if (index_last_changed_mode >= MODES_LENGTH) {
@@ -192,8 +188,6 @@ int add_mode(int code[], int size, int delay) {
 	modes_size++;
 
 	modes[index_last_changed_mode] = new_mode;
-
-	return index_last_changed_mode;
 }
 
 int handle_delay_input() {
