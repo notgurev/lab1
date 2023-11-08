@@ -1,1 +1,3 @@
 ../Core/Src/utils.c:4:6:is_btn_press	8	static
+../Core/Src/utils.c:11:6:is_btn_pressed	32	static
+../Core/Src/utils.c:37:6:reset_LEDs	8	static

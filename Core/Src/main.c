@@ -280,45 +280,41 @@ void execute_command() {
 	print("Invalid command (new xyz, set x, set interrupts on/off)\r\n");
 }
 
-bool GarlandMode_run(struct GarlandMode* current_mode) {
-	bool mode_switched = false;
+// GarlandMode_run runs the garland, and checks for inputs or button presses.
+// Returns on button press.
+void GarlandMode_run(struct GarlandMode* current_mode, uint32_t* last_pressed_time) {
+	while (1) {
+		int led = current_mode->code[current_mode->current_code_index];
 
-	bool btn_state = is_btn_press();
-
-	int led = current_mode->code[current_mode->current_code_index];
-
-	if (led != NONE) {
-		HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_SET);
-	}
-
-	int start_time = HAL_GetTick();
-
-	while (HAL_GetTick() < start_time + current_mode->delay) {
-		if (!mode_switched) {
-			bool i = is_btn_press();
-			mode_switched = !i && btn_state;
-			btn_state = i;
+		if (led != NONE) {
+			HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_SET);
 		}
 
-		if (interrupts_mode) {
-			while (is_data_available()) {
-				recieved_char = uart_read();
-				handle_data();
+		int start_time = HAL_GetTick();
+
+		while (HAL_GetTick() < start_time + current_mode->delay) {
+			if (is_btn_pressed(last_pressed_time)) {
+				return;
 			}
-		} else {
-			if (HAL_UART_Receive(&huart6, &recieved_char, 1, 50) == HAL_OK) {
-				handle_data();
+
+			if (interrupts_mode) {
+				while (is_data_available()) {
+					recieved_char = uart_read();
+					handle_data();
+				}
+			} else {
+				if (HAL_UART_Receive(&huart6, &recieved_char, 1, 50) == HAL_OK) {
+					handle_data();
+				}
 			}
 		}
+
+		current_mode->current_code_index = (current_mode->current_code_index + 1) % current_mode->size;
+
+		if (led != NONE) {
+			HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_RESET);
+		}
 	}
-
-	current_mode->current_code_index = (current_mode->current_code_index + 1) % current_mode->size;
-
-	if (led != NONE) {
-		HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_RESET);
-	}
-
-	return mode_switched;
 }
 
 
@@ -362,7 +358,11 @@ int main(void)
   MX_GPIO_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-  Ringbuf_init ();
+
+  Ringbuf_init();
+
+  uint32_t last_pressed_time = 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -373,11 +373,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  bool switched = GarlandMode_run(&modes[cur_mode_index]);
+	  GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
 
-	  if (switched) {
-		  cur_mode_index = (cur_mode_index + 1) % modes_size;
-	  }
+	  reset_LEDs();
+
+	  cur_mode_index = (cur_mode_index + 1) % modes_size;
   }
 
   /* USER CODE END 3 */
