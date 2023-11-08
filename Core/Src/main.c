@@ -37,7 +37,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define MODES_LENGTH 8
-#define TIMEOUT 10
+#define UART_TIMEOUT 10
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -324,7 +324,7 @@ void print(const char * content) {
 	if (interrupts_mode) {
 		uart_sendstring(content);
 	} else {
-		HAL_UART_Transmit(&huart6, (void *) content, strlen(content), TIMEOUT);
+		HAL_UART_Transmit(&huart6, (void *) content, strlen(content), UART_TIMEOUT);
 	}
 }
 
