@@ -57,7 +57,7 @@
 /* USER CODE BEGIN PV */
 
 struct GarlandMode modes[] = {
-		  { { GREEN, YELLOW }, 2, 1000, 0},
+		  { .code = { GREEN, YELLOW }, .size = 2, .delay = 1000, .current_code_index = 0},
 		  { { GREEN, RED }, 2, 200, 0},
 		  { { YELLOW, RED }, 2, 200, 0},
 		  { { NONE, YELLOW }, 2, 200, 0},
