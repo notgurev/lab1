@@ -300,13 +300,14 @@ bool activate_mode(struct Mode* current_mode) {
 				handle_data();
 			}
 		} else {
-			if (HAL_UART_Receive(&huart6, &recieved_char, 1, 50) == HAL_OK){
+			if (HAL_UART_Receive(&huart6, &recieved_char, 1, 50) == HAL_OK) {
 				handle_data();
 			}
 		}
 	}
 
-	if (++(current_mode->current_code_index) >= current_mode->size) {
+	current_mode->current_code_index++;
+	if (current_mode->current_code_index >= current_mode->size) {
 		current_mode->current_code_index = 0;
 	}
 
