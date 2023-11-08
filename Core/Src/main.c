@@ -53,7 +53,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-//UART_HandleTypeDef huart6;
+
 /* USER CODE BEGIN PV */
 
 struct GarlandMode modes[] = {
