@@ -160,7 +160,7 @@ void handle_data() {
 
 
 
-int add_mode(int code[], int size, int delay){
+int add_mode(int code[], int size, int delay) {
 	index_last_changed_mode++;
 
 	if (index_last_changed_mode >= MODES_LENGTH) {
@@ -168,17 +168,19 @@ int add_mode(int code[], int size, int delay){
 		index_last_changed_mode = 4;
 	}
 
+	struct Mode new_mode = {
+			.size = size,
+			.delay = delay,
+			.current_code_index = 0
+	};
+
 	for (int i = 0; i < size; i++) {
-		MODES[index_last_changed_mode].code[i] = code[i];
+		new_mode.code[i] = code[i];
 	}
 
-	MODES[index_last_changed_mode].size = size;
-	MODES[index_last_changed_mode].delay = delay;
-	MODES[index_last_changed_mode].current_code_index = 0;
+	modes_size++;
 
-	if (modes_size < MODES_LENGTH) {
-		modes_size++;
-	}
+	MODES[index_last_changed_mode] = new_mode;
 
 	return index_last_changed_mode;
 }
