@@ -56,11 +56,15 @@
 
 /* USER CODE BEGIN PV */
 
+const int FAST_SPEED = 200;
+const int MEDIUM_SPEED = 500;
+const int SLOW_SPEED = 1000;
+
 struct GarlandMode modes[MODES_LENGTH] = {
-		  { .code = { GREEN, YELLOW }, .size = 2, .delay = 1000, .current_code_index = 0},
-		  { { GREEN, RED }, 2, 200, 0},
-		  { { YELLOW, RED }, 2, 200, 0},
-		  { { NONE, YELLOW }, 2, 200, 0}
+		  { .code = { GREEN, YELLOW }, .size = 2, .delay = SLOW_SPEED, .current_code_index = 0},
+		  { .code = { GREEN, RED }, .size = 2, .delay = FAST_SPEED, .current_code_index = 0},
+		  { .code = { YELLOW, RED }, .size = 2, .delay = MEDIUM_SPEED, .current_code_index = 0},
+		  { .code = { NONE, YELLOW }, .size = 2, .delay = FAST_SPEED, .current_code_index = 0}
 };
 
 int cur_mode_index = 0;
@@ -79,10 +83,6 @@ int index_char = 0;
 
 const char NEWLINE_CHAR = '\r';
 const char BACKSPACE_CHAR = '\177';
-
-const int FAST_SPEED = 200;
-const int MEDIUM_SPEED = 500;
-const int SLOW_SPEED = 1000;
 
 /* USER CODE END PV */
 
