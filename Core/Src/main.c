@@ -54,12 +54,11 @@ struct Mode MODES[] = {
 		  { { LED_GREEN, LED_YELLOW}, 2, 1000, 0},
 		  { { LED_GREEN, LED_RED}, 2, 200, 0},
 		  { { LED_YELLOW, LED_RED}, 2, 200, 0},
-		  { { LED_GREEN, LED_YELLOW }, 2, 200, 0},
+		  { { LED_NONE, LED_YELLOW }, 2, 200, 0},
 		  { { LED_NONE, LED_NONE }, 2, 200, 0},
 		  { { LED_NONE, LED_NONE }, 2, 200, 0},
 		  { { LED_NONE, LED_NONE}, 2, 200, 0},
 		  { { LED_NONE, LED_NONE }, 2, 200, 0}
-
 };
 
 int cur_mode_index = 0;
