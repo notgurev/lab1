@@ -342,12 +342,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if (activate_mode(&MODES[cur_mode_index])) {
+	  bool switched = activate_mode(&MODES[cur_mode_index]);
+
+	  if (switched) {
 	  		cur_mode_index++;
 	  		if (cur_mode_index >= modes_size) {
 	  			cur_mode_index = 0;
 	  		}
-	  	}
+	  }
   }
 
   /* USER CODE END 3 */
