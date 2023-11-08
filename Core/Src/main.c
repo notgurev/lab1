@@ -77,7 +77,7 @@ bool interrupts_mode = false;
 int new_mode_length = 0;
 int buffer_mode[LENGTH] = {0,};
 
-char recieved_char;
+char received_char;
 char cmd[UART_BUFFER_SIZE] = {0,};
 int index_char = 0;
 
@@ -140,9 +140,9 @@ void clear_cmd() {
 
 void handle_data() {
 	// Echo
-	print(&recieved_char);
+	print(&received_char);
 
-	if (recieved_char == NEWLINE_CHAR) {
+	if (received_char == NEWLINE_CHAR) {
 		print("\n");
 
 		// If some command is present, try to execute.
@@ -155,7 +155,7 @@ void handle_data() {
 		return;
 	}
 
-	if (recieved_char == BACKSPACE_CHAR) {
+	if (received_char == BACKSPACE_CHAR) {
 		cmd[--index_char] = 0;
 		return;
 	}
@@ -166,7 +166,7 @@ void handle_data() {
 		return;
 	}
 
-	cmd[index_char++] = recieved_char;
+	cmd[index_char++] = received_char;
 }
 
 
@@ -300,11 +300,11 @@ void GarlandMode_run(struct GarlandMode* current_mode, uint32_t* last_pressed_ti
 
 			if (interrupts_mode) {
 				while (is_data_available()) {
-					recieved_char = uart_read();
+					received_char = uart_read();
 					handle_data();
 				}
 			} else {
-				if (HAL_UART_Receive(&huart6, &recieved_char, 1, 50) == HAL_OK) {
+				if (HAL_UART_Receive(&huart6, &received_char, 1, 50) == HAL_OK) {
 					handle_data();
 				}
 			}

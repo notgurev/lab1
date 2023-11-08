@@ -3462,9 +3462,9 @@ LOAD c:/programs/stm32cubeide/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
  .bss.buffer_mode
                 0x000000002000029c       0x20 ./Core/Src/main.o
                 0x000000002000029c                buffer_mode
- .bss.recieved_char
+ .bss.received_char
                 0x00000000200002bc        0x1 ./Core/Src/main.o
-                0x00000000200002bc                recieved_char
+                0x00000000200002bc                received_char
  *fill*         0x00000000200002bd        0x3 
  .bss.cmd       0x00000000200002c0       0x40 ./Core/Src/main.o
                 0x00000000200002c0                cmd

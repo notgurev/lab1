@@ -1118,11 +1118,11 @@ void handle_data() {
  8000a1c:	b580      	push	{r7, lr}
  8000a1e:	af00      	add	r7, sp, #0
 	// Echo
-	print(&recieved_char);
+	print(&received_char);
  8000a20:	481b      	ldr	r0, [pc, #108]	; (8000a90 <handle_data+0x74>)
  8000a22:	f000 fa4f 	bl	8000ec4 <print>
 
-	if (recieved_char == NEWLINE_CHAR) {
+	if (received_char == NEWLINE_CHAR) {
  8000a26:	4b1a      	ldr	r3, [pc, #104]	; (8000a90 <handle_data+0x74>)
  8000a28:	781b      	ldrb	r3, [r3, #0]
  8000a2a:	220d      	movs	r2, #13
@@ -1149,7 +1149,7 @@ void handle_data() {
  8000a46:	e022      	b.n	8000a8e <handle_data+0x72>
 	}
 
-	if (recieved_char == BACKSPACE_CHAR) {
+	if (received_char == BACKSPACE_CHAR) {
  8000a48:	4b11      	ldr	r3, [pc, #68]	; (8000a90 <handle_data+0x74>)
  8000a4a:	781b      	ldrb	r3, [r3, #0]
  8000a4c:	227f      	movs	r2, #127	; 0x7f
@@ -1184,7 +1184,7 @@ void handle_data() {
  8000a7a:	e008      	b.n	8000a8e <handle_data+0x72>
 	}
 
-	cmd[index_char++] = recieved_char;
+	cmd[index_char++] = received_char;
  8000a7c:	4b06      	ldr	r3, [pc, #24]	; (8000a98 <handle_data+0x7c>)
  8000a7e:	681b      	ldr	r3, [r3, #0]
  8000a80:	1c5a      	adds	r2, r3, #1
@@ -1714,7 +1714,7 @@ void GarlandMode_run(struct GarlandMode* current_mode, uint32_t* last_pressed_ti
  8000e34:	d00e      	beq.n	8000e54 <GarlandMode_run+0x68>
 				while (is_data_available()) {
  8000e36:	e007      	b.n	8000e48 <GarlandMode_run+0x5c>
-					recieved_char = uart_read();
+					received_char = uart_read();
  8000e38:	f7ff fbfa 	bl	8000630 <uart_read>
  8000e3c:	4603      	mov	r3, r0
  8000e3e:	b2da      	uxtb	r2, r3
@@ -1730,7 +1730,7 @@ void GarlandMode_run(struct GarlandMode* current_mode, uint32_t* last_pressed_ti
  8000e52:	e00a      	b.n	8000e6a <GarlandMode_run+0x7e>
 				}
 			} else {
-				if (HAL_UART_Receive(&huart6, &recieved_char, 1, 50) == HAL_OK) {
+				if (HAL_UART_Receive(&huart6, &received_char, 1, 50) == HAL_OK) {
  8000e54:	2332      	movs	r3, #50	; 0x32
  8000e56:	2201      	movs	r2, #1
  8000e58:	4918      	ldr	r1, [pc, #96]	; (8000ebc <GarlandMode_run+0xd0>)
