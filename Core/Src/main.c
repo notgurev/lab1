@@ -75,6 +75,8 @@ char recieved_char;
 char cmd[UART_BUFFER_SIZE] = {0,};
 int index_char = 0;
 
+const char NEWLINE_CHAR = '\r';
+const char BACKSPACE_CHAR = '\177';
 
 /* USER CODE END PV */
 
@@ -125,29 +127,29 @@ void clean_cmd(){
 	index_char = 0;
 }
 
-
-
 void handle_data() {
-	print(&recieved_char); // echo
+	// Echo
+	print(&recieved_char);
 
-	if (recieved_char == '\r') { // enter
-		if (index_char == 0) { // cmd is empty, just an empty line
-			print("\n");
-			clean_cmd();
-			return;
-		}
+	if (recieved_char == NEWLINE_CHAR) {
 		print("\n");
-		execute_command();
+
+		// If some command is present, try to execute.
+		// If not, just go to next line without an error message.
+		if (index_char != 0) {
+			execute_command();
+		}
+
 		clean_cmd();
 		return;
 	}
 
-	if (recieved_char == '\177') { // backspace
+	if (recieved_char == BACKSPACE_CHAR) {
 		cmd[--index_char] = 0;
 		return;
 	}
 
-	if (index_char >= UART_BUFFER_SIZE) { // overflow
+	if (index_char >= UART_BUFFER_SIZE) {
 		print("\r\nBuffer overflow!\r\n");
 		clean_cmd();
 		return;
