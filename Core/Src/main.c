@@ -27,6 +27,7 @@
 #include "UartRingbuffer.h"
 #include "mode.c"
 #include <string.h>
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
