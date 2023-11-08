@@ -56,7 +56,7 @@
 //UART_HandleTypeDef huart6;
 /* USER CODE BEGIN PV */
 
-struct Mode modes[] = {
+struct GarlandMode modes[] = {
 		  { { GREEN, YELLOW }, 2, 1000, 0},
 		  { { GREEN, RED }, 2, 200, 0},
 		  { { YELLOW, RED }, 2, 200, 0},
@@ -178,7 +178,7 @@ int add_mode(int code[], int size, int delay) {
 		index_last_changed_mode = 4;
 	}
 
-	struct Mode new_mode = {
+	struct GarlandMode new_mode = {
 			.size = size,
 			.delay = delay,
 			.current_code_index = 0
@@ -280,7 +280,7 @@ void execute_command() {
 	print("Invalid command (new xyz, set x, set interrupts on/off)\r\n");
 }
 
-bool activate_mode(struct Mode* current_mode) {
+bool GarlandMode_run(struct GarlandMode* current_mode) {
 	bool mode_switched = false;
 
 	bool btn_state = is_btn_press();
@@ -373,7 +373,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  bool switched = activate_mode(&modes[cur_mode_index]);
+	  bool switched = GarlandMode_run(&modes[cur_mode_index]);
 
 	  if (switched) {
 		  cur_mode_index = (cur_mode_index + 1) % modes_size;

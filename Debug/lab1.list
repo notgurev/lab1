@@ -41,11 +41,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  18 .debug_line   0000a52b  00000000  00000000  0004f686  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    000cf775  00000000  00000000  00059bb1  2**0
+ 19 .debug_str    000cf783  00000000  00000000  00059bb1  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .comment      00000050  00000000  00000000  00129326  2**0
+ 20 .comment      00000050  00000000  00000000  00129334  2**0
                   CONTENTS, READONLY
- 21 .debug_frame  00002100  00000000  00000000  00129378  2**2
+ 21 .debug_frame  00002100  00000000  00000000  00129384  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1231,7 +1231,7 @@ int add_mode(int code[], int size, int delay) {
  8000ac6:	601a      	str	r2, [r3, #0]
 	}
 
-	struct Mode new_mode = {
+	struct GarlandMode new_mode = {
  8000ac8:	f107 0310 	add.w	r3, r7, #16
  8000acc:	222c      	movs	r2, #44	; 0x2c
  8000ace:	2100      	movs	r1, #0
@@ -1659,9 +1659,9 @@ void execute_command() {
  8000de4:	080037b8 	.word	0x080037b8
  8000de8:	080037fc 	.word	0x080037fc
 
-08000dec <activate_mode>:
+08000dec <GarlandMode_run>:
 
-bool activate_mode(struct Mode* current_mode) {
+bool GarlandMode_run(struct GarlandMode* current_mode) {
  8000dec:	b580      	push	{r7, lr}
  8000dee:	b086      	sub	sp, #24
  8000df0:	af00      	add	r7, sp, #0
@@ -1685,13 +1685,13 @@ bool activate_mode(struct Mode* current_mode) {
 	if (led != NONE) {
  8000e0c:	693b      	ldr	r3, [r7, #16]
  8000e0e:	f1b3 3fff 	cmp.w	r3, #4294967295
- 8000e12:	d006      	beq.n	8000e22 <activate_mode+0x36>
+ 8000e12:	d006      	beq.n	8000e22 <GarlandMode_run+0x36>
 		HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_SET);
  8000e14:	693b      	ldr	r3, [r7, #16]
  8000e16:	b29b      	uxth	r3, r3
  8000e18:	2201      	movs	r2, #1
  8000e1a:	4619      	mov	r1, r3
- 8000e1c:	4833      	ldr	r0, [pc, #204]	; (8000eec <activate_mode+0x100>)
+ 8000e1c:	4833      	ldr	r0, [pc, #204]	; (8000eec <GarlandMode_run+0x100>)
  8000e1e:	f000 fddd 	bl	80019dc <HAL_GPIO_WritePin>
 	}
 
@@ -1701,13 +1701,13 @@ bool activate_mode(struct Mode* current_mode) {
  8000e28:	60fb      	str	r3, [r7, #12]
 
 	while (HAL_GetTick() < start_time + current_mode->delay) {
- 8000e2a:	e03a      	b.n	8000ea2 <activate_mode+0xb6>
+ 8000e2a:	e03a      	b.n	8000ea2 <GarlandMode_run+0xb6>
 		if (!mode_switched) {
  8000e2c:	7dfb      	ldrb	r3, [r7, #23]
  8000e2e:	f083 0301 	eor.w	r3, r3, #1
  8000e32:	b2db      	uxtb	r3, r3
  8000e34:	2b00      	cmp	r3, #0
- 8000e36:	d016      	beq.n	8000e66 <activate_mode+0x7a>
+ 8000e36:	d016      	beq.n	8000e66 <GarlandMode_run+0x7a>
 			bool i = is_btn_press();
  8000e38:	f000 fa4c 	bl	80012d4 <is_btn_press>
  8000e3c:	4603      	mov	r3, r0
@@ -1717,12 +1717,12 @@ bool activate_mode(struct Mode* current_mode) {
  8000e42:	f083 0301 	eor.w	r3, r3, #1
  8000e46:	b2db      	uxtb	r3, r3
  8000e48:	2b00      	cmp	r3, #0
- 8000e4a:	d004      	beq.n	8000e56 <activate_mode+0x6a>
+ 8000e4a:	d004      	beq.n	8000e56 <GarlandMode_run+0x6a>
  8000e4c:	7dbb      	ldrb	r3, [r7, #22]
  8000e4e:	2b00      	cmp	r3, #0
- 8000e50:	d001      	beq.n	8000e56 <activate_mode+0x6a>
+ 8000e50:	d001      	beq.n	8000e56 <GarlandMode_run+0x6a>
  8000e52:	2301      	movs	r3, #1
- 8000e54:	e000      	b.n	8000e58 <activate_mode+0x6c>
+ 8000e54:	e000      	b.n	8000e58 <GarlandMode_run+0x6c>
  8000e56:	2300      	movs	r3, #0
  8000e58:	75fb      	strb	r3, [r7, #23]
  8000e5a:	7dfb      	ldrb	r3, [r7, #23]
@@ -1734,17 +1734,17 @@ bool activate_mode(struct Mode* current_mode) {
 		}
 
 		if (interrupts_mode) {
- 8000e66:	4b22      	ldr	r3, [pc, #136]	; (8000ef0 <activate_mode+0x104>)
+ 8000e66:	4b22      	ldr	r3, [pc, #136]	; (8000ef0 <GarlandMode_run+0x104>)
  8000e68:	781b      	ldrb	r3, [r3, #0]
  8000e6a:	2b00      	cmp	r3, #0
- 8000e6c:	d00e      	beq.n	8000e8c <activate_mode+0xa0>
+ 8000e6c:	d00e      	beq.n	8000e8c <GarlandMode_run+0xa0>
 			while (is_data_available()) {
- 8000e6e:	e007      	b.n	8000e80 <activate_mode+0x94>
+ 8000e6e:	e007      	b.n	8000e80 <GarlandMode_run+0x94>
 				recieved_char = uart_read();
  8000e70:	f7ff fbde 	bl	8000630 <uart_read>
  8000e74:	4603      	mov	r3, r0
  8000e76:	b2da      	uxtb	r2, r3
- 8000e78:	4b1e      	ldr	r3, [pc, #120]	; (8000ef4 <activate_mode+0x108>)
+ 8000e78:	4b1e      	ldr	r3, [pc, #120]	; (8000ef4 <GarlandMode_run+0x108>)
  8000e7a:	701a      	strb	r2, [r3, #0]
 				handle_data();
  8000e7c:	f7ff fdce 	bl	8000a1c <handle_data>
@@ -1752,19 +1752,19 @@ bool activate_mode(struct Mode* current_mode) {
  8000e80:	f7ff fc32 	bl	80006e8 <is_data_available>
  8000e84:	4603      	mov	r3, r0
  8000e86:	2b00      	cmp	r3, #0
- 8000e88:	d1f2      	bne.n	8000e70 <activate_mode+0x84>
- 8000e8a:	e00a      	b.n	8000ea2 <activate_mode+0xb6>
+ 8000e88:	d1f2      	bne.n	8000e70 <GarlandMode_run+0x84>
+ 8000e8a:	e00a      	b.n	8000ea2 <GarlandMode_run+0xb6>
 			}
 		} else {
 			if (HAL_UART_Receive(&huart6, &recieved_char, 1, 50) == HAL_OK) {
  8000e8c:	2332      	movs	r3, #50	; 0x32
  8000e8e:	2201      	movs	r2, #1
- 8000e90:	4918      	ldr	r1, [pc, #96]	; (8000ef4 <activate_mode+0x108>)
- 8000e92:	4819      	ldr	r0, [pc, #100]	; (8000ef8 <activate_mode+0x10c>)
+ 8000e90:	4918      	ldr	r1, [pc, #96]	; (8000ef4 <GarlandMode_run+0x108>)
+ 8000e92:	4819      	ldr	r0, [pc, #100]	; (8000ef8 <GarlandMode_run+0x10c>)
  8000e94:	f001 fb43 	bl	800251e <HAL_UART_Receive>
  8000e98:	4603      	mov	r3, r0
  8000e9a:	2b00      	cmp	r3, #0
- 8000e9c:	d101      	bne.n	8000ea2 <activate_mode+0xb6>
+ 8000e9c:	d101      	bne.n	8000ea2 <GarlandMode_run+0xb6>
 				handle_data();
  8000e9e:	f7ff fdbd 	bl	8000a1c <handle_data>
 	while (HAL_GetTick() < start_time + current_mode->delay) {
@@ -1775,7 +1775,7 @@ bool activate_mode(struct Mode* current_mode) {
  8000eac:	68fb      	ldr	r3, [r7, #12]
  8000eae:	4413      	add	r3, r2
  8000eb0:	4299      	cmp	r1, r3
- 8000eb2:	d3bb      	bcc.n	8000e2c <activate_mode+0x40>
+ 8000eb2:	d3bb      	bcc.n	8000e2c <GarlandMode_run+0x40>
 			}
 		}
 	}
@@ -1795,13 +1795,13 @@ bool activate_mode(struct Mode* current_mode) {
 	if (led != NONE) {
  8000ecc:	693b      	ldr	r3, [r7, #16]
  8000ece:	f1b3 3fff 	cmp.w	r3, #4294967295
- 8000ed2:	d006      	beq.n	8000ee2 <activate_mode+0xf6>
+ 8000ed2:	d006      	beq.n	8000ee2 <GarlandMode_run+0xf6>
 		HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_RESET);
  8000ed4:	693b      	ldr	r3, [r7, #16]
  8000ed6:	b29b      	uxth	r3, r3
  8000ed8:	2200      	movs	r2, #0
  8000eda:	4619      	mov	r1, r3
- 8000edc:	4803      	ldr	r0, [pc, #12]	; (8000eec <activate_mode+0x100>)
+ 8000edc:	4803      	ldr	r0, [pc, #12]	; (8000eec <GarlandMode_run+0x100>)
  8000ede:	f000 fd7d 	bl	80019dc <HAL_GPIO_WritePin>
 	}
 
@@ -1896,7 +1896,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  bool switched = activate_mode(&modes[cur_mode_index]);
+	  bool switched = GarlandMode_run(&modes[cur_mode_index]);
  8000f52:	4b0e      	ldr	r3, [pc, #56]	; (8000f8c <main+0x54>)
  8000f54:	681b      	ldr	r3, [r3, #0]
  8000f56:	222c      	movs	r2, #44	; 0x2c
@@ -1904,7 +1904,7 @@ int main(void)
  8000f5c:	4a0c      	ldr	r2, [pc, #48]	; (8000f90 <main+0x58>)
  8000f5e:	4413      	add	r3, r2
  8000f60:	4618      	mov	r0, r3
- 8000f62:	f7ff ff43 	bl	8000dec <activate_mode>
+ 8000f62:	f7ff ff43 	bl	8000dec <GarlandMode_run>
  8000f66:	4603      	mov	r3, r0
  8000f68:	71fb      	strb	r3, [r7, #7]
 

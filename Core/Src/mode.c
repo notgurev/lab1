@@ -1,6 +1,6 @@
 #define LENGTH 8
 
-typedef struct Mode {
+typedef struct GarlandMode {
 	int code[LENGTH];
 	int size;
 	int delay;

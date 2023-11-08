@@ -4,7 +4,7 @@
 ../Core/Src/main.c:173:5:add_mode	80	static
 ../Core/Src/main.c:198:5:handle_delay_input	8	static
 ../Core/Src/main.c:215:6:execute_command	56	dynamic
-../Core/Src/main.c:283:6:activate_mode	32	static
+../Core/Src/main.c:283:6:GarlandMode_run	32	static
 ../Core/Src/main.c:325:6:print	16	static
 ../Core/Src/main.c:339:5:main	16	static
 ../Core/Src/main.c:391:6:SystemClock_Config	88	static
