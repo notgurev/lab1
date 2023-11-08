@@ -55,10 +55,10 @@ struct Mode MODES[] = {
 		  { { LED_GREEN, LED_RED}, 2, 200, 0},
 		  { { LED_YELLOW, LED_RED}, 2, 200, 0},
 		  { { LED_GREEN, LED_YELLOW }, 2, 200, 0},
-		  { { LED_NO_ONE, LED_NO_ONE }, 2, 200, 0},
-		  { { LED_NO_ONE, LED_NO_ONE }, 2, 200, 0},
-		  { { LED_NO_ONE, LED_NO_ONE}, 2, 200, 0},
-		  { { LED_NO_ONE, LED_NO_ONE }, 2, 200, 0}
+		  { { LED_NONE, LED_NONE }, 2, 200, 0},
+		  { { LED_NONE, LED_NONE }, 2, 200, 0},
+		  { { LED_NONE, LED_NONE}, 2, 200, 0},
+		  { { LED_NONE, LED_NONE }, 2, 200, 0}
 
 };
 
@@ -66,8 +66,8 @@ int cur_mode_index = 0;
 int modes_size = 4;
 int index_last_changed_mode = 3;
 
-bool wait_delay_idx = false;
-bool it_mode = false;
+bool expecting_delay_input = false;
+bool interrupts_mode = false;
 
 int new_mode_length = 0;
 int buffer_mode[LENGTH] = {0,};
@@ -88,13 +88,15 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int parse_mode(const char *s){
+int parse_mode(const char *s) {
 	int i = 0;
-	while(*s) {
-		if  (i >= LENGTH){
+
+	while (*s) {
+		if  (i >= LENGTH) {
 			return -1;
 		}
-		switch(*s++){
+
+		switch (*s++) {
 			case 'g':
 				buffer_mode[i] = LED_GREEN;
 				break;
@@ -105,39 +107,42 @@ int parse_mode(const char *s){
 				buffer_mode[i] = LED_YELLOW;
 				break;
 			case 'n':
-				buffer_mode[i] = LED_NO_ONE;
+				buffer_mode[i] = LED_NONE;
 				break;
 			default:
 				return -1;
 		}
+
 		i++;
 	}
 	return (i > 1) ? i : -1;
 }
 
 void clean_cmd(){
-	for (int j = 0; j < index_char; j++){
+	for (int j = 0; j < index_char; j++) {
 		cmd[j] = 0;
 	}
+
 	index_char = 0;
 }
 
 
 
-void handle_data(){
+void handle_data() {
 	print(&recieved_char);
-	if (recieved_char == '\r'){
+
+	if (recieved_char == '\r') {
 		print("\n");
 		execute_command();
 		clean_cmd();
-	}else{
+	} else {
 		if (recieved_char == '\177'){
 			cmd[--index_char] = 0;
-		}else{
+		} else {
 			if (index_char >= UART_BUFFER_SIZE){
 				print("\r\ntoo long string\r\n");
 				clean_cmd();
-			}else{
+			} else {
 				cmd[index_char++] = recieved_char;
 			}
 		}
@@ -147,20 +152,26 @@ void handle_data(){
 
 
 int add_mode(int code[], int size, int delay){
-	if (++index_last_changed_mode >= MODES_LENGTH) index_last_changed_mode = 4;
+	if (++index_last_changed_mode >= MODES_LENGTH) {
+		index_last_changed_mode = 4;
+	}
 
 	for (int i = 0; i < size; i++){
 		MODES[index_last_changed_mode].code[i] = code[i];
 	}
+
 	MODES[index_last_changed_mode].size = size;
 	MODES[index_last_changed_mode].delay = delay;
 	MODES[index_last_changed_mode].current_code_index = 0;
 
-	if (modes_size < MODES_LENGTH) modes_size++;
+	if (modes_size < MODES_LENGTH) {
+		modes_size++;
+	}
+
 	return index_last_changed_mode;
 }
 
-int handle_delay_input(){
+int handle_delay_input() {
 	if (strcmp(cmd, "1") == 0) return 200;
 	else if (strcmp(cmd, "2") == 0) return 500;
 	else if (strcmp(cmd, "3") == 0) return 1000;
@@ -168,85 +179,124 @@ int handle_delay_input(){
 }
 
 
-void execute_command(){
-	if (wait_delay_idx){
+void execute_command() {
+	// Waiting for delay input
+	if (expecting_delay_input) {
 		int delay = handle_delay_input();
-		if (delay == -1){
-			print("Invalid delay. Try again: ");
-		}else{
-			add_mode(buffer_mode, new_mode_length, delay);
-			char mode_number[1];
-			sprintf(mode_number, "%i", index_last_changed_mode + 1);
-			print("OK\r\nNumber of new mode: ");
-			print(mode_number);
-			print("\r\n");
-			wait_delay_idx = false;
-		}
-	}else{
-		if (strcmp(cmd, "set interrupts on") == 0){
-			it_mode = true;
-			print("OK\r\n");
-			__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
-			__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
-		}else if (strcmp(cmd, "set interrupts off") == 0){
-			it_mode = false;
-			print("OK\r\n");
-			__HAL_UART_DISABLE_IT(&huart6, UART_IT_TXE);
-			__HAL_UART_DISABLE_IT(&huart6, UART_IT_RXNE);
-		}else if (strstr(cmd, "set ") == cmd && strlen(cmd) > 4){
-			int p = atoi(&cmd[4]);
-			if (p <= modes_size && p > 0){
-				cur_mode_index = p - 1;
-				print("OK\r\n");
-			}else print("This mode is't exist\r\n");
 
-		}else if (strstr(cmd, "new ") == cmd){
-			new_mode_length = parse_mode(&cmd[4]);
-			if (new_mode_length != -1){
-				print("Input delay: 1,2 or 3 where 1 = 200ms; 2 = 500ms; 3 = 1000ms: ");
-				wait_delay_idx = true;
-			}else print("Invalid parameter\r\n");
-		}else print("Invalid command\r\n");
+		if (delay == -1) {
+			print("Invalid delay. Try again: ");
+			return;
+		}
+
+		add_mode(buffer_mode, new_mode_length, delay);
+
+		char mode_number[1];
+		sprintf(mode_number, "%i", index_last_changed_mode + 1);
+
+		print("OK\r\nNumber of new mode: ");
+		print(mode_number);
+		print("\r\n");
+
+		expecting_delay_input = false;
+
+		return;
 	}
+
+
+	if (strcmp(cmd, "set interrupts on") == 0) {
+		interrupts_mode = true;
+		print("OK\r\n");
+		__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
+		__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
+		return;
+	}
+
+	if (strcmp(cmd, "set interrupts off") == 0) {
+		interrupts_mode = false;
+		print("OK\r\n");
+		__HAL_UART_DISABLE_IT(&huart6, UART_IT_TXE);
+		__HAL_UART_DISABLE_IT(&huart6, UART_IT_RXNE);
+		return;
+	}
+
+	if (strstr(cmd, "set ") == cmd && strlen(cmd) > 4) {
+		int p = atoi(&cmd[4]);
+
+		if (p <= modes_size && p > 0){
+			cur_mode_index = p - 1;
+			print("OK\r\n");
+		} else {
+			print("This mode does not exist\r\n");
+		}
+
+		return;
+	}
+
+	if (strstr(cmd, "new ") == cmd) {
+		new_mode_length = parse_mode(&cmd[4]);
+		if (new_mode_length != -1){
+			print("Input delay: 1,2 or 3 where 1 = 200ms; 2 = 500ms; 3 = 1000ms: ");
+			expecting_delay_input = true;
+		} else {
+			print("Invalid parameter\r\n");
+		}
+		return;
+	}
+
+	print("Invalid command (new xyz, set x, set interrupts on/off)\r\n");
 }
 
 bool activate_mode(struct Mode* current_mode) {
 	bool mode_switched = false;
+
 	bool btn_state = is_btn_press();
+
 	int led = current_mode->code[current_mode->current_code_index];
-	if (led != LED_NO_ONE) HAL_GPIO_WritePin(GPIOD, PINS[led], GPIO_PIN_SET);
+
+	if (led != LED_NONE) {
+		HAL_GPIO_WritePin(GPIOD, PINS[led], GPIO_PIN_SET);
+	}
 
 	int start_time = HAL_GetTick();
-	while (HAL_GetTick() < start_time + current_mode->delay){
-		if (!mode_switched){
+
+	while (HAL_GetTick() < start_time + current_mode->delay) {
+		if (!mode_switched) {
 			bool i = is_btn_press();
 			mode_switched = !i && btn_state;
 			btn_state = i;
 		}
 
-		if (it_mode){
+		if (interrupts_mode) {
 			while(is_data_available()){
 				recieved_char = uart_read();
 				handle_data();
 			}
-		}else{
+		} else {
 			if (HAL_UART_Receive(&huart6, &recieved_char, 1, 50) == HAL_OK){
 				handle_data();
 			}
 		}
 	}
 
-	if (++(current_mode->current_code_index) >= current_mode->size)
+	if (++(current_mode->current_code_index) >= current_mode->size) {
 		current_mode->current_code_index = 0;
-	if (led != LED_NO_ONE) HAL_GPIO_WritePin(GPIOD, PINS[led], GPIO_PIN_RESET);
+	}
+
+	if (led != LED_NONE) {
+		HAL_GPIO_WritePin(GPIOD, PINS[led], GPIO_PIN_RESET);
+	}
+
 	return mode_switched;
 }
 
 
 void print(const char * content) {
-	if (it_mode) {
+	if (interrupts_mode) {
 		uart_sendstring(content);
-	} else HAL_UART_Transmit(&huart6, (void *) content, strlen(content), TIMEOUT);
+	} else {
+		HAL_UART_Transmit(&huart6, (void *) content, strlen(content), TIMEOUT);
+	}
 }
 
 /* USER CODE END 0 */
@@ -294,8 +344,9 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  if (activate_mode(&MODES[cur_mode_index])) {
 	  		cur_mode_index++;
-	  		if (cur_mode_index >= modes_size)
+	  		if (cur_mode_index >= modes_size) {
 	  			cur_mode_index = 0;
+	  		}
 	  	}
   }
 

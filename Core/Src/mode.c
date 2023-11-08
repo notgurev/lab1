@@ -12,5 +12,5 @@ enum LED {
     LED_GREEN = 0,
     LED_YELLOW = 1,
 	LED_RED = 2,
-	LED_NO_ONE
+	LED_NONE
 };
