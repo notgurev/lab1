@@ -128,9 +128,9 @@ void clean_cmd(){
 
 
 void handle_data() {
-	print(&recieved_char);
+	print(&recieved_char); // echo
 
-	if (recieved_char == '\r') {
+	if (recieved_char == '\r') { // enter
 		if (index_char == 0) { // cmd is empty, just an empty line
 			print("\n");
 			clean_cmd();
@@ -139,18 +139,21 @@ void handle_data() {
 		print("\n");
 		execute_command();
 		clean_cmd();
-	} else {
-		if (recieved_char == '\177'){
-			cmd[--index_char] = 0;
-		} else {
-			if (index_char >= UART_BUFFER_SIZE){
-				print("\r\ntoo long string\r\n");
-				clean_cmd();
-			} else {
-				cmd[index_char++] = recieved_char;
-			}
-		}
+		return;
 	}
+
+	if (recieved_char == '\177') { // backspace
+		cmd[--index_char] = 0;
+		return;
+	}
+
+	if (index_char >= UART_BUFFER_SIZE) { // overflow
+		print("\r\nBuffer overflow!\r\n");
+		clean_cmd();
+		return;
+	}
+
+	cmd[index_char++] = recieved_char;
 }
 
 
