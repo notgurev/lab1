@@ -1055,6 +1055,7 @@ int parse_mode(const char *s) {
  80009b8:	2b00      	cmp	r3, #0
  80009ba:	d1a2      	bne.n	8000902 <parse_mode+0xe>
 	}
+
 	return (i > 1) ? i : -1;
  80009bc:	68fb      	ldr	r3, [r7, #12]
  80009be:	2b01      	cmp	r3, #1

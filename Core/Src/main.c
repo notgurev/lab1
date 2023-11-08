@@ -126,6 +126,7 @@ int parse_mode(const char *s) {
 
 		i++;
 	}
+
 	return (i > 1) ? i : -1;
 }
 
