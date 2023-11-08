@@ -968,7 +968,7 @@ int parse_mode(const char *s) {
 
 	while (*s) {
  8000900:	e058      	b.n	80009b4 <parse_mode+0xc0>
-		if  (i >= LENGTH) {
+		if (i >= LENGTH) {
  8000902:	68fb      	ldr	r3, [r7, #12]
  8000904:	2b07      	cmp	r3, #7
  8000906:	dd02      	ble.n	800090e <parse_mode+0x1a>

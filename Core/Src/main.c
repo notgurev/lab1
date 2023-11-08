@@ -103,7 +103,7 @@ int parse_mode(const char *s) {
 	int i = 0;
 
 	while (*s) {
-		if  (i >= LENGTH) {
+		if (i >= LENGTH) {
 			return -1;
 		}
 
