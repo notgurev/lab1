@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2023 STMicroelectronics.
+  * Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
@@ -51,13 +51,13 @@
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern uint16_t timeout;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
 extern UART_HandleTypeDef huart6;
 /* USER CODE BEGIN EV */
-
+extern void uart_isr (UART_HandleTypeDef *huart);
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -183,7 +183,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
   /* USER CODE BEGIN SysTick_IRQn 0 */
-
+	if(timeout >0)  timeout--;
   /* USER CODE END SysTick_IRQn 0 */
   HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
@@ -204,9 +204,9 @@ void SysTick_Handler(void)
 void USART6_IRQHandler(void)
 {
   /* USER CODE BEGIN USART6_IRQn 0 */
-
+	uart_isr (&huart6);
   /* USER CODE END USART6_IRQn 0 */
-  HAL_UART_IRQHandler(&huart6);
+//  HAL_UART_IRQHandler(&huart6);
   /* USER CODE BEGIN USART6_IRQn 1 */
 
   /* USER CODE END USART6_IRQn 1 */
