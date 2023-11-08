@@ -268,7 +268,7 @@ bool activate_mode(struct Mode* current_mode) {
 		}
 
 		if (interrupts_mode) {
-			while(is_data_available()){
+			while (is_data_available()) {
 				recieved_char = uart_read();
 				handle_data();
 			}
