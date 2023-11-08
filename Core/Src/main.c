@@ -312,10 +312,7 @@ bool activate_mode(struct Mode* current_mode) {
 		}
 	}
 
-	current_mode->current_code_index++;
-	if (current_mode->current_code_index >= current_mode->size) {
-		current_mode->current_code_index = 0;
-	}
+	current_mode->current_code_index = (current_mode->current_code_index + 1) % current_mode->size;
 
 	if (led != NONE) {
 		HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_RESET);
@@ -379,10 +376,7 @@ int main(void)
 	  bool switched = activate_mode(&modes[cur_mode_index]);
 
 	  if (switched) {
-	  		cur_mode_index++;
-	  		if (cur_mode_index >= modes_size) {
-	  			cur_mode_index = 0;
-	  		}
+		  cur_mode_index = (cur_mode_index + 1) % modes_size;
 	  }
   }
 
