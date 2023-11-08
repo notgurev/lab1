@@ -207,7 +207,6 @@ int handle_delay_input() {
 
 
 void execute_command() {
-	// Waiting for delay input
 	if (expecting_delay_input) {
 		int delay = handle_delay_input();
 
