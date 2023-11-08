@@ -131,6 +131,11 @@ void handle_data() {
 	print(&recieved_char);
 
 	if (recieved_char == '\r') {
+		if (index_char == 0) { // cmd is empty, just an empty line
+			print("\n");
+			clean_cmd();
+			return;
+		}
 		print("\n");
 		execute_command();
 		clean_cmd();
