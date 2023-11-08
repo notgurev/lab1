@@ -161,11 +161,14 @@ void handle_data() {
 
 
 int add_mode(int code[], int size, int delay){
-	if (++index_last_changed_mode >= MODES_LENGTH) {
+	index_last_changed_mode++;
+
+	if (index_last_changed_mode >= MODES_LENGTH) {
+		// Return to first mode after first 4 constant modes
 		index_last_changed_mode = 4;
 	}
 
-	for (int i = 0; i < size; i++){
+	for (int i = 0; i < size; i++) {
 		MODES[index_last_changed_mode].code[i] = code[i];
 	}
 
