@@ -1,5 +1,5 @@
-Core/Src/ring_buffer.o: ../Core/Src/ring_buffer.c \
- ../Core/Src/ring_buffer.h \
+Core/Src/UartRingbuffer.o: ../Core/Src/UartRingbuffer.c \
+ ../Core/Src/UartRingbuffer.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -27,7 +27,7 @@ Core/Src/ring_buffer.o: ../Core/Src/ring_buffer.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/usart.h ../Core/Inc/main.h
-../Core/Src/ring_buffer.h:
+../Core/Src/UartRingbuffer.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:

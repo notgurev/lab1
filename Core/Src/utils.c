@@ -75,3 +75,7 @@ void reset_LEDs() {
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin(GPIOD, GPIO_PIN_15, GPIO_PIN_RESET);
 }
+
+bool is_btn_press() {
+	 return HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_15) == 0;
+ }

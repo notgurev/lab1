@@ -1,6 +1,0 @@
-../Core/Src/ring_buffer.c:18:6:ring_buffer_init	4	static
-../Core/Src/ring_buffer.c:23:6:store_char	24	static
-../Core/Src/ring_buffer.c:32:5:buf_read	16	static
-../Core/Src/ring_buffer.c:44:6:buf_write	24	static
-../Core/Src/ring_buffer.c:54:5:data_available	4	static
-../Core/Src/ring_buffer.c:58:6:buf_sendstring	16	static

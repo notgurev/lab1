@@ -6,13 +6,12 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
+  * Copyright (c) 2022 STMicroelectronics.
+  * All rights reserved.
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
   *
   ******************************************************************************
   */
@@ -25,73 +24,19 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "utils.h"
-#include "ring_buffer.h"
-#include <stdbool.h>
+#include "UartRingbuffer.h"
+#include "mode.c"
 #include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdarg.h>
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
-const char OK_MESSAGE[]= "OK";
-const char WRONG_COMMAND[] = "Wrong command";
-
-// Buffer for commands
-uint8_t cmd[UART_BUFFER_SIZE];
-
-uint32_t last_pressed_time = 0;
-uint8_t adding_mode = 3;
-uint8_t cur_mode_code = 0;
-
-bool is_interrupt_mode = false;
-
-char last_received_char;
-const char * content_all;
-
-uint8_t remaining_timeouts_input = 0;
-uint8_t CONST_MODES_COUNT = 4;
-uint8_t current_max_mode = 3;
-#define MAX_MODES_COUNT 8
-
-enum LED {
-    LED_NO_ONE = 0,
-    LED_RED = 1,
-    LED_GREEN = 2,
-    LED_YELLOW = 3,
-};
-
-enum TIMEOUTS {
-	SLOW = 500,
-	MEDIUM = 250,
-	FAST = 100,
-};
-
-struct LightState {
-    enum LED color;
-    enum TIMEOUTS timeout;
-};
-
-struct LEDMode {
-    uint8_t len;
-    struct LightState states[MAX_MODES_COUNT];
-};
-
-struct LastState {
-    uint8_t state[8];
-    uint32_t elapsed_state_time[MAX_MODES_COUNT];
-};
-
-typedef void (* set_led_function)(bool);
-
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define UART_TIMEOUT 10
+#define MODES_LENGTH 8
+#define TIMEOUT 10
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -100,8 +45,37 @@ typedef void (* set_led_function)(bool);
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-
+//UART_HandleTypeDef huart6;
 /* USER CODE BEGIN PV */
+
+uint32_t PINS[] = {GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15};
+
+struct Mode MODES[] = {
+		  { { LED_GREEN, LED_YELLOW}, 2, 1000, 0},
+		  { { LED_GREEN, LED_RED}, 2, 200, 0},
+		  { { LED_YELLOW, LED_RED}, 2, 200, 0},
+		  { { LED_GREEN, LED_YELLOW }, 2, 200, 0},
+		  { { LED_NO_ONE, LED_NO_ONE }, 2, 200, 0},
+		  { { LED_NO_ONE, LED_NO_ONE }, 2, 200, 0},
+		  { { LED_NO_ONE, LED_NO_ONE}, 2, 200, 0},
+		  { { LED_NO_ONE, LED_NO_ONE }, 2, 200, 0}
+
+};
+
+int cur_mode_index = 0;
+int modes_size = 4;
+int index_last_changed_mode = 3;
+
+bool wait_delay_idx = false;
+bool it_mode = false;
+
+int new_mode_length = 0;
+int buffer_mode[LENGTH] = {0,};
+
+char recieved_char;
+char cmd[UART_BUFFER_SIZE] = {0,};
+int index_char = 0;
+
 
 /* USER CODE END PV */
 
@@ -114,369 +88,165 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-const set_led_function led_functions[] = {
-    [LED_NO_ONE] = set_no_one_led,
-    [LED_RED] = set_red_led,
-    [LED_GREEN] = set_green_led,
-    [LED_YELLOW] = set_yellow_led,
-};
-
-
-struct LEDMode modes[8] = {
-		{
-			.len = 2,
-            .states = {
-                {
-                    .color = LED_GREEN,
-                    .timeout = MEDIUM,
-                },
-                {
-                    .color = LED_YELLOW,
-                    .timeout = MEDIUM,
-                },
-            },
-        },
-        {
-            .len = 6,
-            .states = {
-                {
-                    .color = LED_RED,
-                    .timeout = MEDIUM,
-                },
-                {
-                    .color = LED_NO_ONE,
-                    .timeout = MEDIUM,
-                },
-                {
-                    .color = LED_YELLOW,
-                    .timeout = MEDIUM,
-                },
-                {
-                    .color = LED_NO_ONE,
-                    .timeout = MEDIUM,
-                },
-                {
-                    .color = LED_GREEN,
-                    .timeout = MEDIUM,
-                },
-                {
-                    .color = LED_NO_ONE,
-                    .timeout = MEDIUM,
-                },
-            },
-        },
-        {
-            .len = 4,
-            .states = {
-                {
-                    .color = LED_GREEN,
-                    .timeout = SLOW,
-                },
-                {
-                    .color = LED_NO_ONE,
-                    .timeout = MEDIUM,
-                },
-                {
-                    .color = LED_RED,
-                    .timeout = SLOW,
-                },
-                {
-                    .color = LED_NO_ONE,
-                    .timeout = MEDIUM,
-                },
-            },
-        },
-        {
-            .len = 6,
-            .states = {
-                {
-                    .color = LED_RED,
-                    .timeout = SLOW,
-                },
-                {
-                    .color = LED_NO_ONE,
-                    .timeout = SLOW,
-                },
-                {
-                    .color = LED_YELLOW,
-                    .timeout = SLOW,
-                },
-                {
-                    .color = LED_NO_ONE,
-                    .timeout = SLOW,
-                },
-                {
-                    .color = LED_GREEN,
-                    .timeout = SLOW,
-                },
-                {
-                    .color = LED_NO_ONE,
-                    .timeout = SLOW,
-                },
-            },
-        }
-    };
-
-struct LEDMode new_mode;
-
-struct LastState last_state = {
-    .state = { 0 },
-    .elapsed_state_time = { 0 },
-};
-
-void transmit_async(const char * content) {
-	content_all = content;
-	HAL_UART_Transmit_IT(&huart6, (uint8_t *) content, strlen(content));
-}
-
-void transmit(const char * content) {
-	HAL_UART_Transmit(&huart6, (uint8_t *) content, strlen(content), UART_TIMEOUT);
-}
-
-void print(const char * content) {
-	if (is_interrupt_mode) {
-		transmit_async(content);
-	} else {
-		transmit(content);
-	}
-}
-
-void println(const char * message) {
-	print(message);
-	print("\r\n");
-}
-
-void print_format(const char * format, ...) {
-	static char buffer[1024];
-	va_list ap;
-	va_start(ap, format);
-	vsnprintf(buffer, sizeof(buffer), format, ap);
-	va_end(ap);
-	println(buffer);
-}
-
-void set_active_mode(uint8_t mode_number) {
-	led_functions[modes[cur_mode_code].states[last_state.state[cur_mode_code]].color](false);
-
-	cur_mode_code = mode_number;
-
-	if (modes[cur_mode_code].len > 0) {
-		led_functions[modes[cur_mode_code].states[last_state.state[cur_mode_code]].color](true);
-	}
-}
-
-bool handle_set_command() {
-	const char * const mode_idx_str = cmd + 4; // set pointer after 'new '
-
-	uint32_t mode_idx;
-	if ((sscanf(mode_idx_str, "%lu", &mode_idx) != 1) || ((mode_idx < 1 || mode_idx > current_max_mode + 1) && mode_idx < MAX_MODES_COUNT)) {
-		return false;
-	}
-
-	set_active_mode(mode_idx - 1);
-	return true;
-}
-
-bool handle_new_command() {
-    char* pattern = cmd + 4; // set pointer after 'new '; example: rngyn
-	uint32_t pattern_length = strlen(pattern);
-
-	if (pattern_length < 2 || pattern_length > 8) {
-		return false;
-	}
-
-	new_mode.len = pattern_length;
-
-	for (uint8_t i = 0; i < pattern_length; ++i)
-		switch (pattern[i]) {
-			case 'n':
-				new_mode.states[i].color = LED_NO_ONE;
+int parse_mode(const char *s){
+	int i = 0;
+	while(*s) {
+		if  (i >= LENGTH){
+			return -1;
+		}
+		switch(*s++){
+			case 'g':
+				buffer_mode[i] = LED_GREEN;
 				break;
 			case 'r':
-				new_mode.states[i].color = LED_RED;
-				break;
-			case 'g':
-				new_mode.states[i].color = LED_GREEN;
+				buffer_mode[i] = LED_RED;
 				break;
 			case 'y':
-				new_mode.states[i].color = LED_YELLOW;
+				buffer_mode[i] = LED_YELLOW;
+				break;
+			case 'n':
+				buffer_mode[i] = LED_NO_ONE;
 				break;
 			default:
-				return false;
+				return -1;
+		}
+		i++;
+	}
+	return (i > 1) ? i : -1;
+}
+
+void clean_cmd(){
+	for (int j = 0; j < index_char; j++){
+		cmd[j] = 0;
+	}
+	index_char = 0;
+}
+
+
+
+void handle_data(){
+	print(&recieved_char);
+	if (recieved_char == '\r'){
+		print("\n");
+		execute_command();
+		clean_cmd();
+	}else{
+		if (recieved_char == '\177'){
+			cmd[--index_char] = 0;
+		}else{
+			if (index_char >= UART_BUFFER_SIZE){
+				print("\r\ntoo long string\r\n");
+				clean_cmd();
+			}else{
+				cmd[index_char++] = recieved_char;
+			}
+		}
+	}
+}
+
+
+
+int add_mode(int code[], int size, int delay){
+	if (++index_last_changed_mode >= MODES_LENGTH) index_last_changed_mode = 4;
+
+	for (int i = 0; i < size; i++){
+		MODES[index_last_changed_mode].code[i] = code[i];
+	}
+	MODES[index_last_changed_mode].size = size;
+	MODES[index_last_changed_mode].delay = delay;
+	MODES[index_last_changed_mode].current_code_index = 0;
+
+	if (modes_size < MODES_LENGTH) modes_size++;
+	return index_last_changed_mode;
+}
+
+int handle_delay_input(){
+	if (strcmp(cmd, "1") == 0) return 200;
+	else if (strcmp(cmd, "2") == 0) return 500;
+	else if (strcmp(cmd, "3") == 0) return 1000;
+	else return -1;
+}
+
+
+void execute_command(){
+	if (wait_delay_idx){
+		int delay = handle_delay_input();
+		if (delay == -1){
+			print("Invalid delay. Try again: ");
+		}else{
+			add_mode(buffer_mode, new_mode_length, delay);
+			char mode_number[1];
+			sprintf(mode_number, "%i", index_last_changed_mode + 1);
+			print("OK\r\nNumber of new mode: ");
+			print(mode_number);
+			print("\r\n");
+			wait_delay_idx = false;
+		}
+	}else{
+		if (strcmp(cmd, "set interrupts on") == 0){
+			it_mode = true;
+			print("OK\r\n");
+			__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
+			__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
+		}else if (strcmp(cmd, "set interrupts off") == 0){
+			it_mode = false;
+			print("OK\r\n");
+			__HAL_UART_DISABLE_IT(&huart6, UART_IT_TXE);
+			__HAL_UART_DISABLE_IT(&huart6, UART_IT_RXNE);
+		}else if (strstr(cmd, "set ") == cmd && strlen(cmd) > 4){
+			int p = atoi(&cmd[4]);
+			if (p <= modes_size && p > 0){
+				cur_mode_index = p - 1;
+				print("OK\r\n");
+			}else print("This mode is't exist\r\n");
+
+		}else if (strstr(cmd, "new ") == cmd){
+			new_mode_length = parse_mode(&cmd[4]);
+			if (new_mode_length != -1){
+				print("Input delay: 1,2 or 3 where 1 = 200ms; 2 = 500ms; 3 = 1000ms: ");
+				wait_delay_idx = true;
+			}else print("Invalid parameter\r\n");
+		}else print("Invalid command\r\n");
+	}
+}
+
+bool activate_mode(struct Mode* current_mode) {
+	bool mode_switched = false;
+	bool btn_state = is_btn_press();
+	int led = current_mode->code[current_mode->current_code_index];
+	if (led != LED_NO_ONE) HAL_GPIO_WritePin(GPIOD, PINS[led], GPIO_PIN_SET);
+
+	int start_time = HAL_GetTick();
+	while (HAL_GetTick() < start_time + current_mode->delay){
+		if (!mode_switched){
+			bool i = is_btn_press();
+			mode_switched = !i && btn_state;
+			btn_state = i;
 		}
 
-	remaining_timeouts_input = pattern_length;
+		if (it_mode){
+			while(is_data_available()){
+				recieved_char = uart_read();
+				handle_data();
+			}
+		}else{
+			if (HAL_UART_Receive(&huart6, &recieved_char, 1, 50) == HAL_OK){
+				handle_data();
+			}
+		}
+	}
 
-	print_format("Creating new mode with length of %d. Please specify timeouts for each state (slow, medium, fast):\r\n", pattern_length);
-
-	return true;
+	if (++(current_mode->current_code_index) >= current_mode->size)
+		current_mode->current_code_index = 0;
+	if (led != LED_NO_ONE) HAL_GPIO_WritePin(GPIOD, PINS[led], GPIO_PIN_RESET);
+	return mode_switched;
 }
 
-bool handle_new_command_timeout() {
-	const uint8_t state_idx = new_mode.len - remaining_timeouts_input;
 
-	if (strlen(cmd) == 0) { // no code after "new"
-		return false;
-	}
-
-	if (string_equals("slow", cmd)) {
-		new_mode.states[state_idx].timeout = SLOW;
-	}
-
-	else if (string_equals("medium", cmd)) {
-		new_mode.states[state_idx].timeout = MEDIUM;
-	}
-
-	else if (string_equals("fast", cmd)) {
-		new_mode.states[state_idx].timeout = FAST;
-	}
-
-	else {
-		return false;
-	}
-
-	--remaining_timeouts_input;
-
-	if (remaining_timeouts_input == 0) {
-		adding_mode = CONST_MODES_COUNT + (adding_mode + 1 - CONST_MODES_COUNT) % (MAX_MODES_COUNT - CONST_MODES_COUNT + 1);
-
-		const uint8_t mode_idx = adding_mode;
-
-		memcpy(modes + mode_idx, &(new_mode), sizeof(new_mode));
-
-		print_format("The mode %d is created\r\n", mode_idx + 1);
-
-		current_max_mode = (current_max_mode < MAX_MODES_COUNT - 1) ? adding_mode : current_max_mode;
-
-		return true;
-	}
-
-	print_format("Added mode: %d \r\n", adding_mode);
-
-	print_format("%d timeouts are remaining:\r\n", remaining_timeouts_input);
-
-	return true;
-}
-
-void handle_command_line() {
-	bool success = false;
-
-	if (strlen(cmd) == 0) {
-		return; // empty line
-	}
-
-	if (string_equals("set interrupts on", cmd)) {
-		is_interrupt_mode = true;
-		success = true;
-	}
-
-	else if (string_equals("set interrupts off", cmd)) {
-		is_interrupt_mode = false;
-		HAL_UART_AbortReceive(&huart6);
-		HAL_UART_Abort_IT(&huart6);
-		success = true;
-	}
-
-	else if (starts_with("set ", cmd)) {
-		success = handle_set_command();
-	}
-
-	else if (starts_with("new ", cmd)) {
-		success = handle_new_command();
-	}
-
-	else if (remaining_timeouts_input > 0) {
-		success = handle_new_command_timeout();
-	}
-
-	else {
-		success = false;
-	}
-
-	println(success ? OK_MESSAGE : WRONG_COMMAND);
-}
-
-void receive_char_async() {
-	HAL_UART_Receive_IT(
-		&huart6,
-		(uint8_t*) &last_received_char,
-		sizeof(last_received_char)
-	);
-}
-
-bool receive_char() {
-	auto result = HAL_UART_Receive(
-		&huart6,
-		(uint8_t*) &last_received_char,
-		sizeof(last_received_char),
-		UART_TIMEOUT
-	);
-
-	return result == HAL_OK;
-}
-
-void delete_char_from_buffer() {
-	const uint8_t cmd_len = strlen(cmd);
-	if (cmd_len > 0) {
-		cmd[cmd_len - 1] = '\0';
-	}
-}
-
-void clear_buffer() {
-	memset(cmd, '\0', sizeof(cmd));
-}
-
-void readln() {
-    if (is_interrupt_mode) {
-    	if (!data_available()) {
-    		transmit(".");
-    		return;
-    	}
-    	transmit("YES");
-        while(data_available()) {
-            receive_char_async();
-        }
-    } else {
-    	if (!receive_char()) { // try to receive synchronously
-    		return;
-    	}
-    }
-
-    // handle received char
-    print(&last_received_char);
-
-    switch (last_received_char) {
-    	// backspace
-    	case '\b':
-    	case 0x7F: {
-    		delete_char_from_buffer();
-    		return;
-    	}
-    	// enter
-    	case '\r':
-    	    println("\n");
-    		handle_command_line();
-    		clear_buffer();
-    		return;
-    }
-    const uint32_t command_line_length = strlen(cmd);
-
-    // check buffer overflow
-    if (command_line_length == sizeof(cmd) - 1) {
-    	print_format("\r\n %s", WRONG_COMMAND);
-    	clear_buffer();
-    	return;
-    }
-
-    cmd[command_line_length] = last_received_char;
-}
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	last_received_char = buf_read();
-}
-
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-	buf_sendstring(content_all);
+void print(const char * content) {
+	if (it_mode) {
+		uart_sendstring(content);
+	} else HAL_UART_Transmit(&huart6, (void *) content, strlen(content), TIMEOUT);
 }
 
 /* USER CODE END 0 */
@@ -511,46 +281,27 @@ int main(void)
   MX_GPIO_Init();
   MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
-  ring_buffer_init();
+  Ringbuf_init ();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    uint32_t current_time = HAL_GetTick();
-    while (1) {
-        if (is_btn_pressed(&last_pressed_time)) {
-        	set_active_mode((cur_mode_code + 1) % CONST_MODES_COUNT);
-        }
 
-        readln();
-
-        last_state.elapsed_state_time[cur_mode_code] += HAL_GetTick() - current_time;
-
-        current_time = HAL_GetTick();
-
-        const struct LEDMode* current_mode = modes + cur_mode_code;
-
-        if (current_mode->len == 0) {
-            continue;
-        }
-
-        const struct LightState* current_state = current_mode->states + last_state.state[cur_mode_code];
-
-        if (last_state.elapsed_state_time[cur_mode_code] >= current_state->timeout) {
-            led_functions[current_state->color](false);
-
-            last_state.elapsed_state_time[cur_mode_code] = 0;
-
-            last_state.state[cur_mode_code] = (last_state.state[cur_mode_code] + 1) % current_mode->len;
-
-            led_functions[current_mode->states[last_state.state[cur_mode_code]].color](true);
-        }
+  while (1)
+  {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    }
+	  if (activate_mode(&MODES[cur_mode_index])) {
+	  		cur_mode_index++;
+	  		if (cur_mode_index >= modes_size)
+	  			cur_mode_index = 0;
+	  	}
+  }
+
   /* USER CODE END 3 */
 }
+
 
 /**
   * @brief System Clock Configuration
@@ -564,16 +315,27 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 15;
+  RCC_OscInitStruct.PLL.PLLN = 216;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Activate the Over-Drive mode
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -582,12 +344,12 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     Error_Handler();
   }
@@ -604,8 +366,11 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return last_state */
-
+  /* User can add his own implementation to report the HAL error return state */
+//  __disable_irq();
+  while (1)
+  {
+  }
   /* USER CODE END Error_Handler_Debug */
 }
 
@@ -621,7 +386,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

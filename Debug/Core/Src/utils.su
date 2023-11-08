@@ -9,3 +9,4 @@
 ../Core/Src/utils.c:40:6:sleep	16	static
 ../Core/Src/utils.c:47:6:is_btn_pressed	32	static
 ../Core/Src/utils.c:73:6:reset_LEDs	8	static
+../Core/Src/utils.c:79:6:is_btn_press	8	static

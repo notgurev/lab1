@@ -1,0 +1,7 @@
+../Core/Src/UartRingbuffer.c:27:6:Ringbuf_init	4	static
+../Core/Src/UartRingbuffer.c:35:6:store_char	24	static
+../Core/Src/UartRingbuffer.c:52:5:uart_read	16	static
+../Core/Src/UartRingbuffer.c:69:6:uart_write	24	static
+../Core/Src/UartRingbuffer.c:85:5:is_data_available	4	static
+../Core/Src/UartRingbuffer.c:92:6:uart_sendstring	16	static
+../Core/Src/UartRingbuffer.c:98:6:uart_isr	32	static

@@ -22,3 +22,6 @@ void sleep(int ms);
 #define GREEN GPIO_PIN_13
 #define YELLOW GPIO_PIN_14
 #define RED GPIO_PIN_15
+
+// todo replace with my function, this is seva's
+bool is_btn_press();

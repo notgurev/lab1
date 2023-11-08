@@ -1,0 +1,6 @@
+../Core/Src/buffer.c:12:24:CircularBuffer_New	24	static
+../Core/Src/buffer.c:23:6:CircularBuffer_Free	16	static
+../Core/Src/buffer.c:28:6:CircularBuffer_Clear	16	static
+../Core/Src/buffer.c:35:6:CircularBuffer_Push	16	static
+../Core/Src/buffer.c:50:6:CircularBuffer_Pop	16	static
+../Core/Src/buffer.c:65:5:CircularBuffer_Size	16	static
