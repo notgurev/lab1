@@ -235,7 +235,7 @@ void execute_command() {
 	}
 
 
-	if (strcmp(cmd, "set interrupts on") == 0) {
+	if (strcmp(cmd, "set interrupts on") == 0 || strcmp(cmd, "si on") == 0) {
 		interrupts_mode = true;
 		print("OK\r\n");
 		__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
@@ -243,7 +243,7 @@ void execute_command() {
 		return;
 	}
 
-	if (strcmp(cmd, "set interrupts off") == 0) {
+	if (strcmp(cmd, "set interrupts off") == 0 || strcmp(cmd, "si off") == 0) {
 		interrupts_mode = false;
 		print("OK\r\n");
 		__HAL_UART_DISABLE_IT(&huart6, UART_IT_TXE);
