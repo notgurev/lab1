@@ -1,10 +1,6 @@
 #include <stdbool.h>
 #include "gpio.h"
 
-bool is_btn_press() {
-	 return HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_15) == 0;
- }
-
 // Checks if button is pressed.
 // Also checks value of HAL_GetTick to avoid rattle.
 // Sets last_pressed_time if button is considered pressed.
