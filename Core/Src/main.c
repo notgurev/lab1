@@ -36,8 +36,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
 #define MODES_LENGTH 8
 #define UART_TIMEOUT 10
+
+#define GREEN GPIO_PIN_13
+#define YELLOW GPIO_PIN_14
+#define RED GPIO_PIN_15
+#define NONE -1
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,17 +56,15 @@
 //UART_HandleTypeDef huart6;
 /* USER CODE BEGIN PV */
 
-uint32_t PINS[] = {GPIO_PIN_13, GPIO_PIN_14, GPIO_PIN_15};
-
 struct Mode modes[] = {
-		  { { LED_GREEN, LED_YELLOW}, 2, 1000, 0},
-		  { { LED_GREEN, LED_RED}, 2, 200, 0},
-		  { { LED_YELLOW, LED_RED}, 2, 200, 0},
-		  { { LED_NONE, LED_YELLOW }, 2, 200, 0},
-		  { { LED_NONE, LED_NONE }, 2, 200, 0},
-		  { { LED_NONE, LED_NONE }, 2, 200, 0},
-		  { { LED_NONE, LED_NONE}, 2, 200, 0},
-		  { { LED_NONE, LED_NONE }, 2, 200, 0}
+		  { { GREEN, YELLOW }, 2, 1000, 0},
+		  { { GREEN, RED }, 2, 200, 0},
+		  { { YELLOW, RED }, 2, 200, 0},
+		  { { NONE, YELLOW }, 2, 200, 0},
+		  { { NONE, NONE }, 2, 200, 0},
+		  { { NONE, NONE }, 2, 200, 0},
+		  { { NONE, NONE }, 2, 200, 0},
+		  { { NONE, NONE }, 2, 200, 0}
 };
 
 int cur_mode_index = 0;
@@ -104,16 +109,16 @@ int parse_mode(const char *s) {
 
 		switch (*s++) {
 			case 'g':
-				buffer_mode[i] = LED_GREEN;
+				buffer_mode[i] = GREEN;
 				break;
 			case 'r':
-				buffer_mode[i] = LED_RED;
+				buffer_mode[i] = RED;
 				break;
 			case 'y':
-				buffer_mode[i] = LED_YELLOW;
+				buffer_mode[i] = YELLOW;
 				break;
 			case 'n':
-				buffer_mode[i] = LED_NONE;
+				buffer_mode[i] = NONE;
 				break;
 			default:
 				return -1;
@@ -282,8 +287,8 @@ bool activate_mode(struct Mode* current_mode) {
 
 	int led = current_mode->code[current_mode->current_code_index];
 
-	if (led != LED_NONE) {
-		HAL_GPIO_WritePin(GPIOD, PINS[led], GPIO_PIN_SET);
+	if (led != NONE) {
+		HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_SET);
 	}
 
 	int start_time = HAL_GetTick();
@@ -312,8 +317,8 @@ bool activate_mode(struct Mode* current_mode) {
 		current_mode->current_code_index = 0;
 	}
 
-	if (led != LED_NONE) {
-		HAL_GPIO_WritePin(GPIOD, PINS[led], GPIO_PIN_RESET);
+	if (led != NONE) {
+		HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_RESET);
 	}
 
 	return mode_switched;
