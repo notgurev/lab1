@@ -84,6 +84,8 @@ int index_char = 0;
 const char NEWLINE_CHAR = '\r';
 const char BACKSPACE_CHAR = '\177';
 
+bool mode_changed_by_command = false;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -251,6 +253,7 @@ void execute_command() {
 		if (p <= modes_size && p > 0){
 			cur_mode_index = p - 1;
 			print("OK\r\n");
+			mode_changed_by_command = true;
 		} else {
 			print("This mode does not exist\r\n");
 		}
@@ -288,6 +291,10 @@ void GarlandMode_run(struct GarlandMode* current_mode, uint32_t* last_pressed_ti
 		int start_time = HAL_GetTick();
 
 		while (HAL_GetTick() < start_time + current_mode->delay) {
+			if (mode_changed_by_command) {
+				return;
+			}
+
 			if (is_btn_pressed(last_pressed_time)) {
 				return;
 			}
@@ -371,6 +378,11 @@ int main(void)
 	  GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
 
 	  reset_LEDs();
+
+	  if (mode_changed_by_command) {
+		  mode_changed_by_command = false;
+		  continue;
+	  }
 
 	  cur_mode_index = (cur_mode_index + 1) % modes_size;
   }
