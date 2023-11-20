@@ -233,7 +233,7 @@ void execute_command() {
 
 	if (strcmp(cmd, "set interrupts on") == 0 || strcmp(cmd, "si on") == 0) {
 		interrupts_mode = true;
-		print("OK\r\n");
+		print("Interrupts enabled\r\n");
 		__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
 		__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
 		return;
@@ -241,7 +241,7 @@ void execute_command() {
 
 	if (strcmp(cmd, "set interrupts off") == 0 || strcmp(cmd, "si off") == 0) {
 		interrupts_mode = false;
-		print("OK\r\n");
+		print("Interrupts disabled\r\n");
 		__HAL_UART_DISABLE_IT(&huart6, UART_IT_TXE);
 		__HAL_UART_DISABLE_IT(&huart6, UART_IT_RXNE);
 		return;
@@ -252,7 +252,7 @@ void execute_command() {
 
 		if (p <= modes_size && p > 0){
 			cur_mode_index = p - 1;
-			print("OK\r\n");
+			print("Mode changed\r\n");
 			mode_changed_by_command = true;
 		} else {
 			print("This mode does not exist\r\n");
