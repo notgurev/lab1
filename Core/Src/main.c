@@ -79,10 +79,14 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void set_pin(int led, int brightness){
+void disable_all_pins() {
 	htim4.Instance->CCR2 = 0;
 	htim4.Instance->CCR3 = 0;
 	htim4.Instance->CCR4 = 0;
+}
+
+void set_pin(int led, int brightness){
+	disable_all_pins();
 
 	switch (led) {
 		case 0:
@@ -167,7 +171,8 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   __HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
   __HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
-  set_pin(-1, 0);
+
+  disable_all_pins();
 
   bool changed = false; // whether mode was modified in editing mode
 
@@ -253,14 +258,15 @@ int main(void)
 
 	int mode_index = mode_num - 1;
 
-	if (mode_index != -2) {
-		if (mode_index != -1) {
-			set_pin(MODES[mode_index].led, MODES[mode_index].brightness);
-			print_mode_description(MODES[mode_index], -1);
-		} else {
-			set_pin(-1, 0);
-			print("Disabled all diodes\n\r");
-		}
+	if (mode_num == 0) {
+		disable_all_pins();
+		print("Disabled all diodes\n\r");
+		continue;
+	}
+
+	if (mode_num > 0) {
+		set_pin(MODES[mode_index].led, MODES[mode_index].brightness);
+		print_mode_description(MODES[mode_index], -1);
 	}
   }
 
