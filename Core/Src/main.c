@@ -65,7 +65,7 @@ struct Mode MODES[] = {
 struct Mode buffer_mode = {LED_GREEN, 0};
 int input_index = 0;
 
-bool is_setting_mode = false;
+bool is_editing_mode = false;
 
 /* USER CODE END PV */
 
@@ -178,9 +178,9 @@ int main(void)
 
 	char received_char = uart_read();
 
-	if (is_setting_mode) {
+	if (is_editing_mode) {
 		if (received_char == '\r') {
-			is_setting_mode = false;
+			is_editing_mode = false;
 
 			if (changed) {
 				MODES[input_index].led = buffer_mode.led;
@@ -190,8 +190,8 @@ int main(void)
 
 			changed = false;
 
-
 			print("\n\r== Editing mode disabled ==\n\r");
+
 			continue;
 		}
 
@@ -236,10 +236,11 @@ int main(void)
 	}
 
 	if (received_char == '\r') {
-		is_setting_mode = true;
+		is_editing_mode = true;
 		print("\n\r== Editing mode enabled ==\n\r");
 		print("Colors: a - green, b - yellow, c - red\n\r");
 		print("Brightness: + to increase, - to decrease\n\r");
+		print("Select mode: 1-9\n\r");
 		continue;
 	}
 
