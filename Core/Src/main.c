@@ -97,9 +97,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 
 void set_pin(int led, int brightness){
-	htim4.Instance->CCR2 = 0;
-	htim4.Instance->CCR3 = 0;
-	htim4.Instance->CCR4 = 0;
+	disable_all_pins();
 
 	switch (led) {
 		case 0 :
@@ -112,6 +110,12 @@ void set_pin(int led, int brightness){
 			htim4.Instance->CCR4 = 10 * brightness;
 			break;
 	}
+}
+
+void disable_all_pins() {
+	htim4.Instance->CCR2 = 0;
+	htim4.Instance->CCR3 = 0;
+	htim4.Instance->CCR4 = 0;
 }
 
 void print(const char * content) {
@@ -140,10 +144,16 @@ void print_mode_description(struct Mode mode, int index, bool is_editing_mode){
 
 int get_peressed_btn_index(){
 	const uint32_t t = HAL_GetTick();
-	if (t - last_pressing_time < KB_KEY_DEBOUNCE_TIME) return -1;
+
+	if (t - last_pressing_time < KB_KEY_DEBOUNCE_TIME) {
+		return -1;
+	}
+
 	int index = -1;
+
 	uint8_t reg_buffer = ~0;
 
+	// Clear register by writing zeroes
 	uint8_t tmp = 0;
 	HAL_I2C_Mem_Write(&hi2c1, KB_I2C_WRITE_ADDRESS, KB_OUTPUT_REG, 1, &tmp, 1, KB_KEY_DEBOUNCE_TIME);
 
@@ -154,21 +164,25 @@ int get_peressed_btn_index(){
 
 		HAL_Delay(10);
 
-		flag = HAL_I2C_Mem_Read(&hi2c1, KB_I2C_READ_ADDRESS, KB_INPUT_REG, 1, &reg_buffer, 1, KB_KEY_DEBOUNCE_TIME);
+		HAL_I2C_Mem_Read(&hi2c1, KB_I2C_READ_ADDRESS, KB_INPUT_REG, 1, &reg_buffer, 1, KB_KEY_DEBOUNCE_TIME);
 
-		switch(reg_buffer >> 4){
+		switch(reg_buffer >> 4) {
 			case 6: index = row * 3 + 1; break;
 			case 5: index = row * 3 + 2; break;
 			case 3: index = row * 3 + 3; break;
 		}
 	}
-	if (index != -1) last_pressing_time = t;
 
-	if (index == last_peressed_btn_index){
+	if (index != -1) {
+		last_pressing_time = t;
+	}
+
+	if (index == last_peressed_btn_index) {
 		return -1;
 	}
 
 	last_peressed_btn_index = index;
+
 	return index;
 }
 
@@ -176,12 +190,18 @@ char key2char(const int key){
     return is_digit_input_mode ? digits[key - 1] : chars[key - 1];
 }
 
-void print_char_value(const char * array, int i){
+void print_char_value(const char * array, int i) {
 	if (array[i] == 'q'){
 		print("change keyboard layout");
-	}else if (array[i] == '\r'){
+		return;
+	}
+
+	if (array[i] == '\r'){
 		print("enter");
-	}else if (array[i] != '!'){
+		return;
+	}
+
+	if (array[i] != '!'){
 		char s[2];
 		s[0] = array[i];
 		s[1] = '\0';
@@ -189,7 +209,7 @@ void print_char_value(const char * array, int i){
 	}
 }
 
-void print_key_value(int i){
+void print_key_value(int i) {
 	print("Digit mode: ");
 	print_char_value(digits, i);
 	print(", Char mode: ");
@@ -242,7 +262,9 @@ int main(void)
   HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
   __HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
   __HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
-  set_pin(-1, 0);
+
+  disable_all_pins();
+
   while (1)
   {
     /* USER CODE END WHILE */
@@ -318,7 +340,7 @@ int main(void)
 						set_pin(MODES[mode_index].led, MODES[mode_index].brightness);
 						print_mode_description(MODES[mode_index], mode_index, false);
 					} else {
-						set_pin(-1, 0);
+						disable_all_pins();
 						print("Every pin is off\n\r");
 					}
 				}
