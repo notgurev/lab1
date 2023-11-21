@@ -163,75 +163,99 @@ int main(void)
   __HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
   __HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
   set_pin(-1, 0);
-  while (1)
-  {
+
+  bool changed = false; // whether mode was modified in editing mode
+
+  while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
-	  while(is_data_available()){
-		char received_char = uart_read();
-		if (is_setting_mode) {
-			if (received_char == '\r') {
-				is_setting_mode = false;
+	// Wait for available data
+	if (!is_data_available()) {
+		continue;
+	}
+
+	char received_char = uart_read();
+
+	if (is_setting_mode) {
+		if (received_char == '\r') {
+			is_setting_mode = false;
+
+			if (changed) {
 				MODES[input_index].led = buffer_mode.led;
 				MODES[input_index].brightness = buffer_mode.brightness;
-				print("Mode is saved\n\r");
-				print("Setting mode is off\n\r");
-			} else {
-				bool changed = true;
-				int i = atoi(&received_char) - 1;
-				if (i >= 0) {
-					input_index = i;
-					buffer_mode.led = MODES[input_index].led;
-					buffer_mode.brightness = MODES[input_index].brightness;
-				} else switch (received_char) {
-					case 'a' :
-						buffer_mode.led = LED_GREEN;
-						print("Changed color to green\r\n");
-						break;
-					case 'b' :
-						buffer_mode.led = LED_YELLOW;
-						print("Changed color to yellow\r\n");
-						break;
-					case 'c' :
-						buffer_mode.led = LED_RED;
-						print("Changed color to red\r\n");
-						break;
-					case '-' :
-						buffer_mode.brightness = buffer_mode.brightness >= 10 ? buffer_mode.brightness - 10 : 0;
-						print("Decreased brightness\r\n");
-						break;
-					case '+' :
-						buffer_mode.brightness = buffer_mode.brightness <= 90 ? buffer_mode.brightness + 10 : 100;
-						print("Increased brightness\r\n");
-						break;
-					default:
-						changed = false;
-						break;
-				}
-				if (changed) {
-					print_mode_description(buffer_mode, input_index);
-				}
+				print("Mode settings saved\n\r");
 			}
-		} else {
-			if (received_char == '\r') {
-				is_setting_mode = true;
-				print("Setting mode is on\n\r");
-			} else {
-				int mode_index = atoi(&received_char) - 1;
-				if (mode_index != -2) {
-					if (mode_index != -1) {
-						set_pin(MODES[mode_index].led, MODES[mode_index].brightness);
-						print_mode_description(MODES[mode_index], -1);
-					} else {
-						set_pin(-1, 0);
-						print("Every pin is off\n\r");
-					}
-				}
-			}
+
+			changed = false;
+
+
+			print("\n\r== Editing mode disabled ==\n\r");
+			continue;
 		}
-	  }
+
+		changed = true;
+
+		int i = atoi(&received_char) - 1;
+		if (i >= 0) {
+			input_index = i;
+			buffer_mode.led = MODES[input_index].led;
+			buffer_mode.brightness = MODES[input_index].brightness;
+		} else switch (received_char) {
+			case 'a' :
+				buffer_mode.led = LED_GREEN;
+				print("Changed color to green\r\n");
+				break;
+			case 'b' :
+				buffer_mode.led = LED_YELLOW;
+				print("Changed color to yellow\r\n");
+				break;
+			case 'c' :
+				buffer_mode.led = LED_RED;
+				print("Changed color to red\r\n");
+				break;
+			case '-' :
+				buffer_mode.brightness = buffer_mode.brightness >= 10 ? buffer_mode.brightness - 10 : 0;
+				print("Decreased brightness\r\n");
+				break;
+			case '+' :
+				buffer_mode.brightness = buffer_mode.brightness <= 90 ? buffer_mode.brightness + 10 : 100;
+				print("Increased brightness\r\n");
+				break;
+			default: // wrong character, nothing actually changed
+				changed = false;
+				break;
+		}
+
+		if (changed) {
+			print_mode_description(buffer_mode, input_index);
+		}
+
+		continue;
+	}
+
+	if (received_char == '\r') {
+		is_setting_mode = true;
+		print("\n\r== Editing mode enabled ==\n\r");
+		print("Colors: a - green, b - yellow, c - red\n\r");
+		print("Brightness: + to increase, - to decrease\n\r");
+		continue;
+	}
+
+	int mode_num = atoi(&received_char); // starts from 1
+
+	int mode_index = mode_num - 1;
+
+	if (mode_index != -2) {
+		if (mode_index != -1) {
+			set_pin(MODES[mode_index].led, MODES[mode_index].brightness);
+			print_mode_description(MODES[mode_index], -1);
+		} else {
+			set_pin(-1, 0);
+			print("Disabled all diodes\n\r");
+		}
+	}
   }
 
   /* USER CODE END 3 */
