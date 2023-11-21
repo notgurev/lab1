@@ -1,4 +1,5 @@
 "./Core/Src/UartRingbuffer.o"
+"./Core/Src/buffer.o"
 "./Core/Src/gpio.o"
 "./Core/Src/main.o"
 "./Core/Src/mode.o"
@@ -7,6 +8,7 @@
 "./Core/Src/syscalls.o"
 "./Core/Src/sysmem.o"
 "./Core/Src/system_stm32f4xx.o"
+"./Core/Src/tim.o"
 "./Core/Src/usart.o"
 "./Core/Src/utils.o"
 "./Core/Startup/startup_stm32f427vitx.o"

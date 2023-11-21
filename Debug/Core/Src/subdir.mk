@@ -6,6 +6,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Core/Src/UartRingbuffer.c \
+../Core/Src/buffer.c \
 ../Core/Src/gpio.c \
 ../Core/Src/main.c \
 ../Core/Src/mode.c \
@@ -14,11 +15,13 @@ C_SRCS += \
 ../Core/Src/syscalls.c \
 ../Core/Src/sysmem.c \
 ../Core/Src/system_stm32f4xx.c \
+../Core/Src/tim.c \
 ../Core/Src/usart.c \
 ../Core/Src/utils.c 
 
 OBJS += \
 ./Core/Src/UartRingbuffer.o \
+./Core/Src/buffer.o \
 ./Core/Src/gpio.o \
 ./Core/Src/main.o \
 ./Core/Src/mode.o \
@@ -27,11 +30,13 @@ OBJS += \
 ./Core/Src/syscalls.o \
 ./Core/Src/sysmem.o \
 ./Core/Src/system_stm32f4xx.o \
+./Core/Src/tim.o \
 ./Core/Src/usart.o \
 ./Core/Src/utils.o 
 
 C_DEPS += \
 ./Core/Src/UartRingbuffer.d \
+./Core/Src/buffer.d \
 ./Core/Src/gpio.d \
 ./Core/Src/main.d \
 ./Core/Src/mode.d \
@@ -40,6 +45,7 @@ C_DEPS += \
 ./Core/Src/syscalls.d \
 ./Core/Src/sysmem.d \
 ./Core/Src/system_stm32f4xx.d \
+./Core/Src/tim.d \
 ./Core/Src/usart.d \
 ./Core/Src/utils.d 
 
@@ -51,7 +57,7 @@ Core/Src/%.o Core/Src/%.su: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/UartRingbuffer.d ./Core/Src/UartRingbuffer.o ./Core/Src/UartRingbuffer.su ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/gpio.su ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/mode.d ./Core/Src/mode.o ./Core/Src/mode.su ./Core/Src/stm32f4xx_hal_msp.d ./Core/Src/stm32f4xx_hal_msp.o ./Core/Src/stm32f4xx_hal_msp.su ./Core/Src/stm32f4xx_it.d ./Core/Src/stm32f4xx_it.o ./Core/Src/stm32f4xx_it.su ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f4xx.d ./Core/Src/system_stm32f4xx.o ./Core/Src/system_stm32f4xx.su ./Core/Src/usart.d ./Core/Src/usart.o ./Core/Src/usart.su ./Core/Src/utils.d ./Core/Src/utils.o ./Core/Src/utils.su
+	-$(RM) ./Core/Src/UartRingbuffer.d ./Core/Src/UartRingbuffer.o ./Core/Src/UartRingbuffer.su ./Core/Src/buffer.d ./Core/Src/buffer.o ./Core/Src/buffer.su ./Core/Src/gpio.d ./Core/Src/gpio.o ./Core/Src/gpio.su ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/mode.d ./Core/Src/mode.o ./Core/Src/mode.su ./Core/Src/stm32f4xx_hal_msp.d ./Core/Src/stm32f4xx_hal_msp.o ./Core/Src/stm32f4xx_hal_msp.su ./Core/Src/stm32f4xx_it.d ./Core/Src/stm32f4xx_it.o ./Core/Src/stm32f4xx_it.su ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f4xx.d ./Core/Src/system_stm32f4xx.o ./Core/Src/system_stm32f4xx.su ./Core/Src/tim.d ./Core/Src/tim.o ./Core/Src/tim.su ./Core/Src/usart.d ./Core/Src/usart.o ./Core/Src/usart.su ./Core/Src/utils.d ./Core/Src/utils.o ./Core/Src/utils.su
 
 .PHONY: clean-Core-2f-Src
 

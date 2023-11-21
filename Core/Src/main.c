@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -27,7 +28,7 @@
 #include "UartRingbuffer.h"
 #include "mode.c"
 #include <string.h>
-#include <stdio.h>
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -36,15 +37,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
-#define MODES_LENGTH 8
-#define UART_TIMEOUT 20
-
-#define GREEN GPIO_PIN_13
-#define YELLOW GPIO_PIN_14
-#define RED GPIO_PIN_15
-#define NONE -1
-
+#define MODES_LENGTH 9
+#define TIMEOUT 10
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -56,35 +50,22 @@
 
 /* USER CODE BEGIN PV */
 
-const int FAST_SPEED = 200;
-const int MEDIUM_SPEED = 500;
-const int SLOW_SPEED = 1000;
-
-struct GarlandMode modes[MODES_LENGTH] = {
-		  { .code = { GREEN, YELLOW }, .size = 2, .delay = SLOW_SPEED, .current_code_index = 0},
-		  { .code = { GREEN, RED }, .size = 2, .delay = FAST_SPEED, .current_code_index = 0},
-		  { .code = { YELLOW, RED }, .size = 2, .delay = MEDIUM_SPEED, .current_code_index = 0},
-		  { .code = { NONE, YELLOW }, .size = 2, .delay = FAST_SPEED, .current_code_index = 0}
+struct Mode MODES[] = {
+		  {LED_GREEN, 10},
+		  {LED_GREEN, 40},
+		  {LED_GREEN, 100},
+		  {LED_YELLOW, 10},
+		  {LED_YELLOW, 40},
+		  {LED_YELLOW, 100},
+		  {LED_RED, 10},
+		  {LED_RED, 40},
+		  {LED_RED, 100}
 };
 
-int cur_mode_index = 0;
-int modes_size = 4;
-int index_last_changed_mode = 3;
+struct Mode buffer_mode = {LED_GREEN, 0};
+int input_index = 0;
 
-bool expecting_delay_input = false;
-bool interrupts_mode = false;
-
-int new_mode_length = 0;
-int buffer_mode[LENGTH] = {0,};
-
-char received_char;
-char cmd[UART_BUFFER_SIZE] = {0,};
-int index_char = 0;
-
-const char NEWLINE_CHAR = '\r';
-const char BACKSPACE_CHAR = '\177';
-
-bool mode_changed_by_command = false;
+bool is_setting_mode = false;
 
 /* USER CODE END PV */
 
@@ -97,235 +78,45 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-int parse_mode(const char *s) {
-	int i = 0;
+void set_pin(int led, int brightness){
+	htim4.Instance->CCR2 = 0;
+	htim4.Instance->CCR3 = 0;
+	htim4.Instance->CCR4 = 0;
 
-	while (*s) {
-		if (i >= LENGTH) {
-			return -1;
-		}
-
-		switch (*s++) {
-			case 'g':
-				buffer_mode[i] = GREEN;
-				break;
-			case 'r':
-				buffer_mode[i] = RED;
-				break;
-			case 'y':
-				buffer_mode[i] = YELLOW;
-				break;
-			case 'n':
-				buffer_mode[i] = NONE;
-				break;
-			default:
-				return -1;
-		}
-
-		i++;
-	}
-
-	return (i > 1) ? i : -1;
-}
-
-void clear_cmd() {
-	for (int j = 0; j < index_char; j++) {
-		cmd[j] = 0;
-	}
-
-	index_char = 0;
-}
-
-void handle_data() {
-	// Echo
-	print(&received_char);
-
-	if (received_char == NEWLINE_CHAR) {
-		print("\n");
-
-		// If some command is present, try to execute.
-		// If not, just go to next line without an error message.
-		if (index_char != 0) {
-			execute_command();
-		}
-
-		clear_cmd();
-		return;
-	}
-
-	if (received_char == BACKSPACE_CHAR) {
-		cmd[--index_char] = 0;
-		return;
-	}
-
-	if (index_char >= UART_BUFFER_SIZE) {
-		print("\r\nBuffer overflow!\r\n");
-		clear_cmd();
-		return;
-	}
-
-	cmd[index_char++] = received_char;
-}
-
-
-
-void add_mode(int code[], int size, int delay) {
-	index_last_changed_mode++;
-
-	if (index_last_changed_mode >= MODES_LENGTH) {
-		// Return to first mode after first 4 constant modes
-		index_last_changed_mode = 4;
-	}
-
-	struct GarlandMode new_mode = {
-			.size = size,
-			.delay = delay,
-			.current_code_index = 0
-	};
-
-	for (int i = 0; i < size; i++) {
-		new_mode.code[i] = code[i];
-	}
-
-	modes_size++;
-
-	modes[index_last_changed_mode] = new_mode;
-}
-
-int handle_delay_input() {
-	if (strcmp(cmd, "fast") == 0 || strcmp(cmd, "f") == 0) {
-		 return FAST_SPEED;
-	}
-
-	if (strcmp(cmd, "medium") == 0 || strcmp(cmd, "m") == 0) {
-		return MEDIUM_SPEED;
-	}
-
-	if (strcmp(cmd, "slow") == 0 || strcmp(cmd, "s") == 0) {
-		return SLOW_SPEED;
-	}
-
-	return -1;
-}
-
-
-void execute_command() {
-	if (expecting_delay_input) {
-		int delay = handle_delay_input();
-
-		if (delay == -1) {
-			print("Invalid delay. Try again: ");
-			return;
-		}
-
-		add_mode(buffer_mode, new_mode_length, delay);
-
-		const char* fmt = "OK\r\nNumber of new mode: %i\r\n";
-		char line[strlen(fmt)];
-		sprintf(line, fmt, index_last_changed_mode + 1);
-		print(line);
-
-		expecting_delay_input = false;
-
-		return;
-	}
-
-
-	if (strcmp(cmd, "set interrupts on") == 0 || strcmp(cmd, "si on") == 0) {
-		interrupts_mode = true;
-		print("Interrupts enabled\r\n");
-		__HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
-		__HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
-		return;
-	}
-
-	if (strcmp(cmd, "set interrupts off") == 0 || strcmp(cmd, "si off") == 0) {
-		interrupts_mode = false;
-		print("Interrupts disabled\r\n");
-		__HAL_UART_DISABLE_IT(&huart6, UART_IT_TXE);
-		__HAL_UART_DISABLE_IT(&huart6, UART_IT_RXNE);
-		return;
-	}
-
-	if (strstr(cmd, "set ") == cmd && strlen(cmd) > 4) {
-		int p = atoi(&cmd[4]);
-
-		if (p <= modes_size && p > 0){
-			cur_mode_index = p - 1;
-			print("Mode changed\r\n");
-			mode_changed_by_command = true;
-		} else {
-			print("This mode does not exist\r\n");
-		}
-
-		return;
-	}
-
-	if (strstr(cmd, "new ") == cmd) {
-		new_mode_length = parse_mode(&cmd[4]);
-
-		if (new_mode_length == -1) {
-			print("Invalid parameter\r\n");
-			return;
-		}
-
-		print("Input delay: fast/f (200 ms), medium/m (500 ms), slow (1000 ms): ");
-		expecting_delay_input = true;
-
-		return;
-	}
-
-	print("Invalid command (new xyz, set x, set interrupts on/off)\r\n");
-}
-
-// GarlandMode_run runs the garland, and checks for inputs or button presses.
-// Returns on button press.
-void GarlandMode_run(struct GarlandMode* current_mode, uint32_t* last_pressed_time) {
-	while (1) {
-		int led = current_mode->code[current_mode->current_code_index];
-
-		if (led != NONE) {
-			HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_SET);
-		}
-
-		int start_time = HAL_GetTick();
-
-		while (HAL_GetTick() < start_time + current_mode->delay) {
-			if (mode_changed_by_command) {
-				return;
-			}
-
-			if (is_btn_pressed(last_pressed_time)) {
-				return;
-			}
-
-			if (interrupts_mode) {
-				while (is_data_available()) {
-					received_char = uart_read();
-					handle_data();
-				}
-			} else {
-				if (HAL_UART_Receive(&huart6, &received_char, 1, 50) == HAL_OK) {
-					handle_data();
-				}
-			}
-		}
-
-		current_mode->current_code_index = (current_mode->current_code_index + 1) % current_mode->size;
-
-		if (led != NONE) {
-			HAL_GPIO_WritePin(GPIOD, led, GPIO_PIN_RESET);
-		}
+	switch (led) {
+		case 0 :
+			htim4.Instance->CCR2 = 10 * brightness;
+			break;
+		case 1 :
+			htim4.Instance->CCR3 = 10 * brightness;
+			break;
+		case 2 :
+			htim4.Instance->CCR4 = 10 * brightness;
+			break;
 	}
 }
-
 
 void print(const char * content) {
-	if (interrupts_mode) {
-		uart_sendstring(content);
-	} else {
-		HAL_UART_Transmit(&huart6, (void *) content, strlen(content), UART_TIMEOUT);
+	uart_sendstring(content);
+}
+
+void print_mode_description(struct Mode mode, int index){
+	if (index >= 0){
+		print("Editing mode ");
+		char str_index[1];
+		sprintf(str_index, "%i", index + 1);
+		print(str_index);
+		print(" :");
+	} else print("Mode: ");
+	switch (mode.led) {
+		case 0 : print("green, "); break;
+		case 1 : print("yellow, "); break;
+		case 2 : print("red, "); break;
 	}
+	char mode_brightness[3];
+	sprintf(mode_brightness, "%i", mode.brightness);
+	print(mode_brightness);
+	print("% brightness\n\r");
 }
 
 /* USER CODE END 0 */
@@ -359,32 +150,81 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART6_UART_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-
-  Ringbuf_init();
-
-  uint32_t last_pressed_time = 0;
-
+  Ringbuf_init ();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+  __HAL_UART_ENABLE_IT(&huart6, UART_IT_TXE);
+  __HAL_UART_ENABLE_IT(&huart6, UART_IT_RXNE);
+  set_pin(-1, 0);
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  GarlandMode_run(&modes[cur_mode_index], &last_pressed_time);
 
-	  reset_LEDs();
-
-	  if (mode_changed_by_command) {
-		  mode_changed_by_command = false;
-		  continue;
+	  while(is_data_available()){
+		char received_char = uart_read();
+		if (is_setting_mode) {
+			if (received_char == '\r') {
+				is_setting_mode = false;
+				MODES[input_index].led = buffer_mode.led;
+				MODES[input_index].brightness = buffer_mode.brightness;
+				print("Mode is saved\n\r");
+				print("Setting mode is off\n\r");
+			} else {
+				bool changed = true;
+				int i = atoi(&received_char) - 1;
+				if (i >= 0) {
+					input_index = i;
+					buffer_mode.led = MODES[input_index].led;
+					buffer_mode.brightness = MODES[input_index].brightness;
+				} else switch (received_char) {
+					case 'a' :
+						buffer_mode.led = LED_GREEN;
+						break;
+					case 'b' :
+						buffer_mode.led = LED_YELLOW;
+						break;
+					case 'c' :
+						buffer_mode.led = LED_RED;
+						break;
+					case '-' :
+						buffer_mode.brightness = buffer_mode.brightness >= 10 ? buffer_mode.brightness - 10 : 0;
+						break;
+					case '+' :
+						buffer_mode.brightness = buffer_mode.brightness <= 90 ? buffer_mode.brightness + 10 : 100;
+						break;
+					default:
+						changed = false;
+						break;
+				}
+				if (changed) print_mode_description(buffer_mode, input_index);
+			}
+		} else {
+			if (received_char == '\r') {
+				is_setting_mode = true;
+				print("Setting mode is on\n\r");
+			} else {
+				int mode_index = atoi(&received_char) - 1;
+				if (mode_index != -2) {
+					if (mode_index != -1) {
+						set_pin(MODES[mode_index].led, MODES[mode_index].brightness);
+						print_mode_description(MODES[mode_index], -1);
+					} else {
+						set_pin(-1, 0);
+						print("Every pin is off\n\r");
+					}
+				}
+			}
+		}
 	  }
-
-	  cur_mode_index = (cur_mode_index + 1) % modes_size;
   }
 
   /* USER CODE END 3 */
@@ -402,16 +242,27 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 15;
+  RCC_OscInitStruct.PLL.PLLN = 216;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Activate the Over-Drive mode
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     Error_Handler();
   }
@@ -420,12 +271,12 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     Error_Handler();
   }
