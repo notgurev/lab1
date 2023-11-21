@@ -24,11 +24,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "utils.h"
 #include "UartRingbuffer.h"
 #include "mode.c"
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -37,8 +37,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define MODES_LENGTH 9
-#define TIMEOUT 10
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -62,7 +61,9 @@ struct Mode MODES[] = {
 		  {LED_RED, 100}
 };
 
+// Buffer for mode being edited
 struct Mode buffer_mode = {LED_GREEN, 0};
+
 int input_index = 0;
 
 bool is_editing_mode = false;
@@ -84,13 +85,13 @@ void set_pin(int led, int brightness){
 	htim4.Instance->CCR4 = 0;
 
 	switch (led) {
-		case 0 :
+		case 0:
 			htim4.Instance->CCR2 = 10 * brightness;
 			break;
-		case 1 :
+		case 1:
 			htim4.Instance->CCR3 = 10 * brightness;
 			break;
-		case 2 :
+		case 2:
 			htim4.Instance->CCR4 = 10 * brightness;
 			break;
 	}
@@ -107,12 +108,16 @@ void print_mode_description(struct Mode mode, int index){
 		sprintf(str_index, "%i", index + 1);
 		print(str_index);
 		print(" :");
-	} else print("Mode: ");
-	switch (mode.led) {
-		case 0 : print("green, "); break;
-		case 1 : print("yellow, "); break;
-		case 2 : print("red, "); break;
+	} else {
+		print("Mode: ");
 	}
+
+	switch (mode.led) {
+		case 0: print("green, "); break;
+		case 1: print("yellow, "); break;
+		case 2: print("red, "); break;
+	}
+
 	char mode_brightness[3];
 	sprintf(mode_brightness, "%i", mode.brightness);
 	print(mode_brightness);
@@ -240,7 +245,7 @@ int main(void)
 		print("\n\r== Editing mode enabled ==\n\r");
 		print("Colors: a - green, b - yellow, c - red\n\r");
 		print("Brightness: + to increase, - to decrease\n\r");
-		print("Select mode: 1-9\n\r");
+		print("Select mode by: 1-9\n\r");
 		continue;
 	}
 
