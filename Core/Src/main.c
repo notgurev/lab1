@@ -374,7 +374,7 @@ int main(void)
 
 	if (received_char == '\r') {
 		is_editing_mode = true;
-		print("Setting mode is on\n\r");
+		print("\n\r== Editing mode enabled ==\n\r");
 		continue;
 	}
 
@@ -385,7 +385,7 @@ int main(void)
 			print_mode_description(MODES[mode_index], mode_index, false);
 		} else {
 			disable_all_pins();
-			print("Every pin is off\n\r");
+			print("Disabled all diodes\n\r");
 		}
 	}
   }

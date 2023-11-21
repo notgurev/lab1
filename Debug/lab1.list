@@ -7,19 +7,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         00005b50  080001b0  080001b0  000101b0  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       0000035c  08005d00  08005d00  00015d00  2**2
+  2 .rodata       00000368  08005d00  08005d00  00015d00  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  0800605c  0800605c  000200d8  2**0
+  3 .ARM.extab    00000000  08006068  08006068  000200d8  2**0
                   CONTENTS
-  4 .ARM          00000008  0800605c  0800605c  0001605c  2**2
+  4 .ARM          00000008  08006068  08006068  00016068  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  08006064  08006064  000200d8  2**0
+  5 .preinit_array 00000000  08006070  08006070  000200d8  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08006064  08006064  00016064  2**2
+  6 .init_array   00000004  08006070  08006070  00016070  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .fini_array   00000004  08006068  08006068  00016068  2**2
+  7 .fini_array   00000004  08006074  08006074  00016074  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .data         000000d8  20000000  0800606c  00020000  2**2
+  8 .data         000000d8  20000000  08006078  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
   9 .ccmram       00000000  10000000  10000000  000200d8  2**0
                   CONTENTS
@@ -1965,7 +1965,7 @@ int main(void)
  8000f32:	4b09      	ldr	r3, [pc, #36]	; (8000f58 <main+0x2c0>)
  8000f34:	2201      	movs	r2, #1
  8000f36:	701a      	strb	r2, [r3, #0]
-		print("Setting mode is on\n\r");
+		print("\n\r== Editing mode enabled ==\n\r");
  8000f38:	4816      	ldr	r0, [pc, #88]	; (8000f94 <main+0x2fc>)
  8000f3a:	f7ff fd41 	bl	80009c0 <print>
 		continue;
@@ -2034,7 +2034,7 @@ int main(void)
 		} else {
 			disable_all_pins();
  8000fe4:	f7ff fcd6 	bl	8000994 <disable_all_pins>
-			print("Every pin is off\n\r");
+			print("Disabled all diodes\n\r");
  8000fe8:	4805      	ldr	r0, [pc, #20]	; (8001000 <main+0x368>)
  8000fea:	f7ff fce9 	bl	80009c0 <print>
  8000fee:	e682      	b.n	8000cf6 <main+0x5e>
@@ -2049,7 +2049,7 @@ int main(void)
   {
  8000ffa:	e67c      	b.n	8000cf6 <main+0x5e>
  8000ffc:	20000000 	.word	0x20000000
- 8001000:	08005efc 	.word	0x08005efc
+ 8001000:	08005f04 	.word	0x08005f04
 
 08001004 <SystemClock_Config>:
 /**
@@ -3161,7 +3161,7 @@ LoopFillZerobss:
   ldr r1, =_edata
  8001580:	200000d8 	.word	0x200000d8
   ldr r2, =_sidata
- 8001584:	0800606c 	.word	0x0800606c
+ 8001584:	08006078 	.word	0x08006078
   ldr r2, =_sbss
  8001588:	200000d8 	.word	0x200000d8
   ldr r4, =_ebss
@@ -8735,7 +8735,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  800354a:	bf00      	nop
  800354c:	40023c00 	.word	0x40023c00
  8003550:	40023800 	.word	0x40023800
- 8003554:	08005f10 	.word	0x08005f10
+ 8003554:	08005f1c 	.word	0x08005f1c
  8003558:	20000068 	.word	0x20000068
  800355c:	2000006c 	.word	0x2000006c
 
@@ -8990,7 +8990,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  8003720:	4618      	mov	r0, r3
  8003722:	bd80      	pop	{r7, pc}
  8003724:	40023800 	.word	0x40023800
- 8003728:	08005f20 	.word	0x08005f20
+ 8003728:	08005f2c 	.word	0x08005f2c
 
 0800372c <HAL_RCC_GetPCLK2Freq>:
   * @note   Each time PCLK2 changes, this function must be called to update the
@@ -9016,7 +9016,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
  8003748:	4618      	mov	r0, r3
  800374a:	bd80      	pop	{r7, pc}
  800374c:	40023800 	.word	0x40023800
- 8003750:	08005f20 	.word	0x08005f20
+ 8003750:	08005f2c 	.word	0x08005f2c
 
 08003754 <HAL_TIM_Base_Init>:
   *         Ex: call @ref HAL_TIM_Base_DeInit() before HAL_TIM_Base_Init()
@@ -13420,10 +13420,10 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  80052ce:	4798      	blx	r3
  80052d0:	3601      	adds	r6, #1
  80052d2:	e7f2      	b.n	80052ba <__libc_init_array+0x1e>
- 80052d4:	08006064 	.word	0x08006064
- 80052d8:	08006064 	.word	0x08006064
- 80052dc:	08006064 	.word	0x08006064
- 80052e0:	08006068 	.word	0x08006068
+ 80052d4:	08006070 	.word	0x08006070
+ 80052d8:	08006070 	.word	0x08006070
+ 80052dc:	08006070 	.word	0x08006070
+ 80052e0:	08006074 	.word	0x08006074
 
 080052e4 <memset>:
  80052e4:	4402      	add	r2, r0
@@ -13565,7 +13565,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  800542e:	230a      	movs	r3, #10
  8005430:	e7ab      	b.n	800538a <_strtol_l.constprop.0+0x56>
  8005432:	bf00      	nop
- 8005434:	08005f29 	.word	0x08005f29
+ 8005434:	08005f35 	.word	0x08005f35
 
 08005438 <strtol>:
  8005438:	4613      	mov	r3, r2
@@ -13856,11 +13856,11 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  80056e8:	f000 f87a 	bl	80057e0 <_printf_i>
  80056ec:	e7eb      	b.n	80056c6 <_svfiprintf_r+0x1c2>
  80056ee:	bf00      	nop
- 80056f0:	08006029 	.word	0x08006029
- 80056f4:	08006033 	.word	0x08006033
+ 80056f0:	08006035 	.word	0x08006035
+ 80056f4:	0800603f 	.word	0x0800603f
  80056f8:	00000000 	.word	0x00000000
  80056fc:	0800544d 	.word	0x0800544d
- 8005700:	0800602f 	.word	0x0800602f
+ 8005700:	0800603b 	.word	0x0800603b
 
 08005704 <_printf_common>:
  8005704:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -14196,8 +14196,8 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8005a1c:	f104 0619 	add.w	r6, r4, #25
  8005a20:	e7f5      	b.n	8005a0e <_printf_i+0x22e>
  8005a22:	bf00      	nop
- 8005a24:	0800603a 	.word	0x0800603a
- 8005a28:	0800604b 	.word	0x0800604b
+ 8005a24:	08006046 	.word	0x08006046
+ 8005a28:	08006057 	.word	0x08006057
 
 08005a2c <memcpy>:
  8005a2c:	440a      	add	r2, r1
