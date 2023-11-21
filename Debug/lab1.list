@@ -7,19 +7,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         00005b50  080001b0  080001b0  000101b0  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       00000368  08005d00  08005d00  00015d00  2**2
+  2 .rodata       00000364  08005d00  08005d00  00015d00  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  08006068  08006068  000200d8  2**0
+  3 .ARM.extab    00000000  08006064  08006064  000200d8  2**0
                   CONTENTS
-  4 .ARM          00000008  08006068  08006068  00016068  2**2
+  4 .ARM          00000008  08006064  08006064  00016064  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  08006070  08006070  000200d8  2**0
+  5 .preinit_array 00000000  0800606c  0800606c  000200d8  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08006070  08006070  00016070  2**2
+  6 .init_array   00000004  0800606c  0800606c  0001606c  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .fini_array   00000004  08006074  08006074  00016074  2**2
+  7 .fini_array   00000004  08006070  08006070  00016070  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  8 .data         000000d8  20000000  08006078  00020000  2**2
+  8 .data         000000d8  20000000  08006074  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
   9 .ccmram       00000000  10000000  10000000  000200d8  2**0
                   CONTENTS
@@ -1458,7 +1458,7 @@ void print_char_value(const char * array, int i) {
  8000bfc:	781b      	ldrb	r3, [r3, #0]
  8000bfe:	2b71      	cmp	r3, #113	; 0x71
  8000c00:	d103      	bne.n	8000c0a <print_char_value+0x1e>
-		print("change keyboard layout");
+		print("chars/digits mode");
  8000c02:	4811      	ldr	r0, [pc, #68]	; (8000c48 <print_char_value+0x5c>)
  8000c04:	f7ff fedc 	bl	80009c0 <print>
 		return;
@@ -1506,7 +1506,7 @@ void print_char_value(const char * array, int i) {
  8000c44:	46bd      	mov	sp, r7
  8000c46:	bd80      	pop	{r7, pc}
  8000c48:	08005d4c 	.word	0x08005d4c
- 8000c4c:	08005d64 	.word	0x08005d64
+ 8000c4c:	08005d60 	.word	0x08005d60
 
 08000c50 <print_key_value>:
 
@@ -1538,11 +1538,11 @@ void print_key_value(int i) {
  8000c7e:	46bd      	mov	sp, r7
  8000c80:	bd80      	pop	{r7, pc}
  8000c82:	bf00      	nop
- 8000c84:	08005d6c 	.word	0x08005d6c
+ 8000c84:	08005d68 	.word	0x08005d68
  8000c88:	20000050 	.word	0x20000050
- 8000c8c:	08005d7c 	.word	0x08005d7c
+ 8000c8c:	08005d78 	.word	0x08005d78
  8000c90:	2000005c 	.word	0x2000005c
- 8000c94:	08005d8c 	.word	0x08005d8c
+ 8000c94:	08005d88 	.word	0x08005d88
 
 08000c98 <main>:
 /**
@@ -1974,24 +1974,24 @@ int main(void)
  8000f44:	20000248 	.word	0x20000248
  8000f48:	200001f9 	.word	0x200001f9
  8000f4c:	200001f8 	.word	0x200001f8
- 8000f50:	08005d90 	.word	0x08005d90
- 8000f54:	08005db8 	.word	0x08005db8
+ 8000f50:	08005d8c 	.word	0x08005d8c
+ 8000f54:	08005db4 	.word	0x08005db4
  8000f58:	200001f0 	.word	0x200001f0
  8000f5c:	200001ec 	.word	0x200001ec
  8000f60:	200001e4 	.word	0x200001e4
  8000f64:	20000000 	.word	0x20000000
- 8000f68:	08005de4 	.word	0x08005de4
- 8000f6c:	08005dfc 	.word	0x08005dfc
+ 8000f68:	08005de0 	.word	0x08005de0
+ 8000f6c:	08005df8 	.word	0x08005df8
  8000f70:	2000004c 	.word	0x2000004c
- 8000f74:	08005e1c 	.word	0x08005e1c
- 8000f78:	08005e38 	.word	0x08005e38
- 8000f7c:	08005e54 	.word	0x08005e54
- 8000f80:	08005e70 	.word	0x08005e70
- 8000f84:	08005e88 	.word	0x08005e88
- 8000f88:	08005ea0 	.word	0x08005ea0
- 8000f8c:	08005eb4 	.word	0x08005eb4
- 8000f90:	08005ecc 	.word	0x08005ecc
- 8000f94:	08005ee4 	.word	0x08005ee4
+ 8000f74:	08005e18 	.word	0x08005e18
+ 8000f78:	08005e34 	.word	0x08005e34
+ 8000f7c:	08005e50 	.word	0x08005e50
+ 8000f80:	08005e6c 	.word	0x08005e6c
+ 8000f84:	08005e84 	.word	0x08005e84
+ 8000f88:	08005e9c 	.word	0x08005e9c
+ 8000f8c:	08005eb0 	.word	0x08005eb0
+ 8000f90:	08005ec8 	.word	0x08005ec8
+ 8000f94:	08005ee0 	.word	0x08005ee0
 	}
 
 	int mode_index = atoi(&received_char) - 1;
@@ -2049,7 +2049,7 @@ int main(void)
   {
  8000ffa:	e67c      	b.n	8000cf6 <main+0x5e>
  8000ffc:	20000000 	.word	0x20000000
- 8001000:	08005f04 	.word	0x08005f04
+ 8001000:	08005f00 	.word	0x08005f00
 
 08001004 <SystemClock_Config>:
 /**
@@ -3161,7 +3161,7 @@ LoopFillZerobss:
   ldr r1, =_edata
  8001580:	200000d8 	.word	0x200000d8
   ldr r2, =_sidata
- 8001584:	08006078 	.word	0x08006078
+ 8001584:	08006074 	.word	0x08006074
   ldr r2, =_sbss
  8001588:	200000d8 	.word	0x200000d8
   ldr r4, =_ebss
@@ -8735,7 +8735,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(RCC_ClkInitTypeDef  *RCC_ClkInitStruct, ui
  800354a:	bf00      	nop
  800354c:	40023c00 	.word	0x40023c00
  8003550:	40023800 	.word	0x40023800
- 8003554:	08005f1c 	.word	0x08005f1c
+ 8003554:	08005f18 	.word	0x08005f18
  8003558:	20000068 	.word	0x20000068
  800355c:	2000006c 	.word	0x2000006c
 
@@ -8990,7 +8990,7 @@ uint32_t HAL_RCC_GetPCLK1Freq(void)
  8003720:	4618      	mov	r0, r3
  8003722:	bd80      	pop	{r7, pc}
  8003724:	40023800 	.word	0x40023800
- 8003728:	08005f2c 	.word	0x08005f2c
+ 8003728:	08005f28 	.word	0x08005f28
 
 0800372c <HAL_RCC_GetPCLK2Freq>:
   * @note   Each time PCLK2 changes, this function must be called to update the
@@ -9016,7 +9016,7 @@ uint32_t HAL_RCC_GetPCLK2Freq(void)
  8003748:	4618      	mov	r0, r3
  800374a:	bd80      	pop	{r7, pc}
  800374c:	40023800 	.word	0x40023800
- 8003750:	08005f2c 	.word	0x08005f2c
+ 8003750:	08005f28 	.word	0x08005f28
 
 08003754 <HAL_TIM_Base_Init>:
   *         Ex: call @ref HAL_TIM_Base_DeInit() before HAL_TIM_Base_Init()
@@ -13420,10 +13420,10 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  80052ce:	4798      	blx	r3
  80052d0:	3601      	adds	r6, #1
  80052d2:	e7f2      	b.n	80052ba <__libc_init_array+0x1e>
- 80052d4:	08006070 	.word	0x08006070
- 80052d8:	08006070 	.word	0x08006070
- 80052dc:	08006070 	.word	0x08006070
- 80052e0:	08006074 	.word	0x08006074
+ 80052d4:	0800606c 	.word	0x0800606c
+ 80052d8:	0800606c 	.word	0x0800606c
+ 80052dc:	0800606c 	.word	0x0800606c
+ 80052e0:	08006070 	.word	0x08006070
 
 080052e4 <memset>:
  80052e4:	4402      	add	r2, r0
@@ -13565,7 +13565,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  800542e:	230a      	movs	r3, #10
  8005430:	e7ab      	b.n	800538a <_strtol_l.constprop.0+0x56>
  8005432:	bf00      	nop
- 8005434:	08005f35 	.word	0x08005f35
+ 8005434:	08005f31 	.word	0x08005f31
 
 08005438 <strtol>:
  8005438:	4613      	mov	r3, r2
@@ -13856,11 +13856,11 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  80056e8:	f000 f87a 	bl	80057e0 <_printf_i>
  80056ec:	e7eb      	b.n	80056c6 <_svfiprintf_r+0x1c2>
  80056ee:	bf00      	nop
- 80056f0:	08006035 	.word	0x08006035
- 80056f4:	0800603f 	.word	0x0800603f
+ 80056f0:	08006031 	.word	0x08006031
+ 80056f4:	0800603b 	.word	0x0800603b
  80056f8:	00000000 	.word	0x00000000
  80056fc:	0800544d 	.word	0x0800544d
- 8005700:	0800603b 	.word	0x0800603b
+ 8005700:	08006037 	.word	0x08006037
 
 08005704 <_printf_common>:
  8005704:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -14196,8 +14196,8 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8005a1c:	f104 0619 	add.w	r6, r4, #25
  8005a20:	e7f5      	b.n	8005a0e <_printf_i+0x22e>
  8005a22:	bf00      	nop
- 8005a24:	08006046 	.word	0x08006046
- 8005a28:	08006057 	.word	0x08006057
+ 8005a24:	08006042 	.word	0x08006042
+ 8005a28:	08006053 	.word	0x08006053
 
 08005a2c <memcpy>:
  8005a2c:	440a      	add	r2, r1

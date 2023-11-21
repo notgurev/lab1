@@ -199,7 +199,7 @@ char key2char(const int key){
 
 void print_char_value(const char * array, int i) {
 	if (array[i] == 'q'){
-		print("change keyboard layout");
+		print("chars/digits mode");
 		return;
 	}
 
