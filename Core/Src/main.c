@@ -188,24 +188,31 @@ int main(void)
 				} else switch (received_char) {
 					case 'a' :
 						buffer_mode.led = LED_GREEN;
+						print("Changed color to green\r\n");
 						break;
 					case 'b' :
 						buffer_mode.led = LED_YELLOW;
+						print("Changed color to yellow\r\n");
 						break;
 					case 'c' :
 						buffer_mode.led = LED_RED;
+						print("Changed color to red\r\n");
 						break;
 					case '-' :
 						buffer_mode.brightness = buffer_mode.brightness >= 10 ? buffer_mode.brightness - 10 : 0;
+						print("Decreased brightness\r\n");
 						break;
 					case '+' :
 						buffer_mode.brightness = buffer_mode.brightness <= 90 ? buffer_mode.brightness + 10 : 100;
+						print("Increased brightness\r\n");
 						break;
 					default:
 						changed = false;
 						break;
 				}
-				if (changed) print_mode_description(buffer_mode, input_index);
+				if (changed) {
+					print_mode_description(buffer_mode, input_index);
+				}
 			}
 		} else {
 			if (received_char == '\r') {
