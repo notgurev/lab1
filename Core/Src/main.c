@@ -74,9 +74,10 @@ struct Mode MODES[] = {
 struct Mode buffer_mode = {LED_GREEN, 0};
 int input_index = 0;
 
-bool is_setting_mode = false;
-uint32_t last_pressing_time = 0;
-int last_peressed_btn_index = -1;
+bool is_editing_mode = false;
+
+uint32_t last_pressed_time = 0;
+int last_pressed_btn_index = -1;
 
 bool is_digit_input_mode = true;
 bool is_test_keyboard_mode = false;
@@ -129,23 +130,29 @@ void print_number(const int content) {
 }
 
 void print_mode_description(struct Mode mode, int index, bool is_editing_mode){
-	if (is_editing_mode) print("Editing mode ");
-	else print("Mode ");
+	if (is_editing_mode) {
+		print("Editing mode ");
+	} else {
+		print("Mode ");
+	}
+
 	print_number(index + 1);
 	print(": ");
+
 	switch (mode.led) {
 		case 0 : print("green, "); break;
 		case 1 : print("yellow, "); break;
 		case 2 : print("red, "); break;
 	}
+
 	print_number(mode.brightness);
 	print("% brightness\n\r");
 }
 
-int get_peressed_btn_index(){
+int get_pressed_btn_index() {
 	const uint32_t t = HAL_GetTick();
 
-	if (t - last_pressing_time < KB_KEY_DEBOUNCE_TIME) {
+	if (t - last_pressed_time < KB_KEY_DEBOUNCE_TIME) {
 		return -1;
 	}
 
@@ -174,14 +181,14 @@ int get_peressed_btn_index(){
 	}
 
 	if (index != -1) {
-		last_pressing_time = t;
+		last_pressed_time = t;
 	}
 
-	if (index == last_peressed_btn_index) {
+	if (index == last_pressed_btn_index) {
 		return -1;
 	}
 
-	last_peressed_btn_index = index;
+	last_pressed_btn_index = index;
 
 	return index;
 }
@@ -270,83 +277,117 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  bool btn_state = is_btn_press();
-	  if (last_btn_state && !btn_state){
-		  is_test_keyboard_mode = !is_test_keyboard_mode;
-		  if (is_test_keyboard_mode) print("Test keyboard mode is on\n\r");
-		  else print("Test keyboard mode is off\n\r");
-	  }
-	  last_btn_state = btn_state;
+	bool btn_state = is_btn_press();
 
-	  int btn_index = get_peressed_btn_index();
-	  if (btn_index != -1) {
-		char received_char = key2char(btn_index);
-		if (is_test_keyboard_mode) {
-			print_key_value(btn_index - 1);
-		} else if (is_setting_mode) {
-			if (received_char == '\r') {
-				is_setting_mode = false;
-				MODES[input_index].led = buffer_mode.led;
-				MODES[input_index].brightness = buffer_mode.brightness;
-				print("Mode is saved\n\r");
-				print("Setting mode is off\n\r");
-				if (!is_digit_input_mode) {
-					is_digit_input_mode = true;
-					print("Digit input mode is on\n\r");
-				}
-			} else {
-				bool changed = true;
-				int i = atoi(&received_char) - 1;
-				if (i >= 0) {
-					input_index = i;
-					buffer_mode.led = MODES[input_index].led;
-					buffer_mode.brightness = MODES[input_index].brightness;
-				} else switch (received_char) {
-					case 'a' :
-						buffer_mode.led = LED_GREEN;
-						break;
-					case 'b' :
-						buffer_mode.led = LED_YELLOW;
-						break;
-					case 'c' :
-						buffer_mode.led = LED_RED;
-						break;
-					case 'q' :
-						changed = false;
-						is_digit_input_mode = !is_digit_input_mode;
-						if (is_digit_input_mode) print("Digit input mode is on\n\r");
-						else print("Char input mode is on\n\r");
-						break;
-					case '-' :
-						buffer_mode.brightness = buffer_mode.brightness >= 10 ? buffer_mode.brightness - 10 : 0;
-						break;
-					case '+' :
-						buffer_mode.brightness = buffer_mode.brightness <= 90 ? buffer_mode.brightness + 10 : 100;
-						break;
-					default:
-						changed = false;
-						break;
-				}
-				if (changed) print_mode_description(buffer_mode, input_index, true);
-			}
-		} else {
-			if (received_char == '\r') {
-				is_setting_mode = true;
-				print("Setting mode is on\n\r");
-			} else {
-				int mode_index = atoi(&received_char) - 1;
-				if (received_char != 'q') {
-					if (mode_index != -1) {
-						set_pin(MODES[mode_index].led, MODES[mode_index].brightness);
-						print_mode_description(MODES[mode_index], mode_index, false);
-					} else {
-						disable_all_pins();
-						print("Every pin is off\n\r");
-					}
-				}
-			}
-		}
+	if (last_btn_state && !btn_state){
+	  is_test_keyboard_mode = !is_test_keyboard_mode;
+	  if (is_test_keyboard_mode) {
+		  print("\n\r== Keyboard testing mode enabled ==\n\r");
+	  } else {
+		  print("\n\r== Keyboard testing mode disabled ==\n\r");
 	  }
+	}
+
+	last_btn_state = btn_state;
+
+	int btn_index = get_pressed_btn_index();
+
+	if (btn_index == -1) { // nothing pressed or error
+	  continue;
+	}
+
+	char received_char = key2char(btn_index);
+
+	if (is_test_keyboard_mode) { // just print
+		print_key_value(btn_index - 1);
+		continue;
+	}
+
+	if (is_editing_mode) {
+		if (received_char == '\r') {
+			is_editing_mode = false;
+			MODES[input_index].led = buffer_mode.led;
+			MODES[input_index].brightness = buffer_mode.brightness;
+
+			print("Mode settings saved\n\r");
+			print("\n\r== Editing mode disabled ==\n\r");
+
+			if (!is_digit_input_mode) {
+				is_digit_input_mode = true;
+				print("Digit input mode is on\n\r");
+			}
+
+			continue;
+		}
+
+		bool changed = true;
+
+		int i = atoi(&received_char) - 1;
+		if (i >= 0) {
+			input_index = i;
+			buffer_mode.led = MODES[input_index].led;
+			buffer_mode.brightness = MODES[input_index].brightness;
+		} else switch (received_char) {
+			case 'a' :
+				buffer_mode.led = LED_GREEN;
+				print("Changed color to green\r\n");
+				break;
+			case 'b' :
+				buffer_mode.led = LED_YELLOW;
+				print("Changed color to yellow\r\n");
+				break;
+			case 'c' :
+				buffer_mode.led = LED_RED;
+				print("Changed color to red\r\n");
+				break;
+			case 'q' :
+				changed = false;
+
+				is_digit_input_mode = !is_digit_input_mode;
+
+				if (is_digit_input_mode) {
+					print("Input mode: digits\r\n");
+				} else {
+					print("Input mode: chars\r\n");
+				}
+
+				break;
+			case '-' :
+				buffer_mode.brightness = buffer_mode.brightness >= 10 ? buffer_mode.brightness - 10 : 0;
+				print("Decreased brightness\r\n");
+				break;
+			case '+' :
+				buffer_mode.brightness = buffer_mode.brightness <= 90 ? buffer_mode.brightness + 10 : 100;
+				print("Increased brightness\r\n");
+				break;
+			default: // wrong character, nothing actually changed
+				changed = false;
+				break;
+		}
+
+		if (changed) {
+			print_mode_description(buffer_mode, input_index, true);
+		}
+
+		continue;
+	}
+
+	if (received_char == '\r') {
+		is_editing_mode = true;
+		print("Setting mode is on\n\r");
+		continue;
+	}
+
+	int mode_index = atoi(&received_char) - 1;
+	if (received_char != 'q') {
+		if (mode_index != -1) {
+			set_pin(MODES[mode_index].led, MODES[mode_index].brightness);
+			print_mode_description(MODES[mode_index], mode_index, false);
+		} else {
+			disable_all_pins();
+			print("Every pin is off\n\r");
+		}
+	}
   }
 
   /* USER CODE END 3 */
